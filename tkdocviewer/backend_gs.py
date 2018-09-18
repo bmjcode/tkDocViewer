@@ -35,25 +35,24 @@ except (NameError): string_type = str
 if sys.platform.startswith("win"):
     found_ghostscript = False
 
-    # Possible names for the Ghostscript executable
-    # Only the console version of Ghostscript will work because we
-    # need to check its output on stdout.
-    if sys.maxsize > 2**32:
+    # Possible names for the Ghostscript executable and Program Files
+    # Only the console version of Ghostscript (gswin??c.exe) will work
+    # because we need to check its output on stdout.
+    if sys.maxsize > 2**32 or os.getenv("ProgramW6432"):
         # Favor 64-bit Ghostscript where supported
         gs_names = "gswin64c.exe", "gswin32c.exe"
+        pf_vars = "ProgramFiles", "ProgramW6432", "ProgramFiles(x86)"
     else:
         gs_names = "gswin32c.exe",
-
-    # Paths to Program Files
-    pf_dirs = os.getenv("PROGRAMFILES"), os.getenv("PROGRAMFILES(x86)")
+        pf_vars = "ProgramFiles",
 
     # Possible locations to look for Ghostscript...
-    # (This is a list, not a set, because we need sort stability)
+    # (This is a list, not a set, to ensure we preserve our search order)
     gs_dirs = []
 
     # 1. A dedicated Ghostscript installation
     #    This likely has the most features and highest-quality rendering.
-    for program_files in pf_dirs:
+    for program_files in map(os.getenv, pf_vars):
         if program_files:
             gs_dir = os.path.join(program_files, "gs")
             if os.path.isdir(gs_dir) and not gs_dir in gs_dirs:
