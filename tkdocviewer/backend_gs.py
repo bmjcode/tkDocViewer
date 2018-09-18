@@ -54,9 +54,10 @@ if sys.platform.startswith("win"):
     # 1. A dedicated Ghostscript installation
     #    This likely has the most features and highest-quality rendering.
     for program_files in pf_dirs:
-        gs_dir = os.path.join(program_files, "gs")
-        if os.path.isdir(gs_dir) and not gs_dir in gs_dirs:
-            gs_dirs.append(gs_dir)
+        if program_files:
+            gs_dir = os.path.join(program_files, "gs")
+            if os.path.isdir(gs_dir) and not gs_dir in gs_dirs:
+                gs_dirs.append(gs_dir)
 
     # 2. The directory containing the running executable
     #    This lets your application distribute its own Ghostscript binary
