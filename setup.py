@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 NAME = "tkDocViewer"
-VERSION = "1.0"
+VERSION = "1.0.1"
 AUTHOR = "Benjamin Johnson"
 AUTHOR_EMAIL = "bmjcode@gmail.com"
 DESCRIPTION = "Document viewer widget for Tkinter"
