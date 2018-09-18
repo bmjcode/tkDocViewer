@@ -212,15 +212,14 @@ class GhostscriptThread(threading.Thread):
         gs_file_path = self.gs_input_path.replace(os.sep, "/")
 
         # Ghostscript command to return the page count of a PDF file
-        gs_pc_command = ("({0}) (r) file runpdfbegin pdfpagecount = quit"
-                         .format(gs_file_path))
+        gs_pc_command = "({0}) (r) file runpdfbegin pdfpagecount = quit"
 
         # Ghostscript command line
         gs_args = [gs_exe,
                    "-q",
                    "-dNODISPLAY",
                    "-c",
-                   gs_pc_command]
+                   gs_pc_command.format(gs_file_path)]
 
         # Return the page count if it's a valid PDF, or None otherwise
         return int(self._call_ghostscript(gs_args))
