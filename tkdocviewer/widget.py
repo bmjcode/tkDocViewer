@@ -182,16 +182,9 @@ class DocViewer(tk.Frame, object):
         # Take the mouse focus when the canvas is clicked
         c.bind("<Button-1>", lambda event=None: c.focus_set())
 
-        # Enable scrolling with the keyboard
-        c.bind("<Up>", lambda event=None: c.yview_scroll(-1, "units"))
-        c.bind("<Down>", lambda event=None: c.yview_scroll(1, "units"))
-        c.bind("<Left>", lambda event=None: c.xview_scroll(-1, "units"))
-        c.bind("<Right>", lambda event=None: c.xview_scroll(1, "units"))
-
-        # Enable scrolling with the mouse wheel
-        c.bind("<MouseWheel>", self._scroll_canvas)
-        c.bind("<Button-4>", self._scroll_canvas)
-        c.bind("<Button-5>", self._scroll_canvas)
+        # Enable scrolling when the canvas has the focus
+        self.bind_arrow_keys(c)
+        self.bind_scroll_wheel(c)
 
         # Re-display text when the canvas is resized
         c.bind("<Configure>", self.refresh)
@@ -211,6 +204,21 @@ class DocViewer(tk.Frame, object):
             tk.Frame.configure(self, **{key: value})
 
     # ------------------------------------------------------------------------
+
+    def bind_arrow_keys(self, widget):
+        """Bind the specified widget's arrow key events to the canvas."""
+
+        widget.bind("<Up>",
+                    lambda event: self._canvas.yview_scroll(-1, "units"))
+
+        widget.bind("<Down>",
+                    lambda event: self._canvas.yview_scroll(1, "units"))
+
+        widget.bind("<Left>",
+                    lambda event: self._canvas.xview_scroll(-1, "units"))
+
+        widget.bind("<Right>",
+                    lambda event: self._canvas.xview_scroll(1, "units"))
 
     def bind_scroll_wheel(self, widget):
         """Bind the specified widget's mouse scroll event to the canvas."""
