@@ -8,9 +8,10 @@ AUTHOR = "Benjamin Johnson"
 AUTHOR_EMAIL = "bmjcode@gmail.com"
 DESCRIPTION = "Document viewer widget for Tkinter"
 
-with open("README", "r") as readme:
+with open("README.md", "r") as readme:
     LONG_DESCRIPTION = readme.read()
 
+LONG_DESCRIPTION_CONTENT_TYPE = "text/markdown"
 URL = "https://github.com/bmjcode/tkDocViewer"
 PACKAGES = find_packages()
 CLASSIFIERS = [
@@ -27,6 +28,7 @@ setup(name=NAME,
       author_email=AUTHOR_EMAIL,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
+      long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
       url=URL,
       packages=PACKAGES,
       classifiers=CLASSIFIERS)
