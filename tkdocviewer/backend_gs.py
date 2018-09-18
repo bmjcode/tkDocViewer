@@ -64,14 +64,6 @@ if sys.platform.startswith("win"):
     #    as a fallback in case it's not installed elsewhere on the system.
     gs_dirs.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 
-    ## 3. Some other location in Program Files
-    ##    Ghostscript might be installed to a non-standard location, or
-    ##    some other application (like a PDF printer driver) might include
-    ##    a version we can use in a pinch. Maybe not the best idea, though.
-    #for program_files in pf_dirs:
-    #    if os.path.isdir(program_files) and not program_files in gs_dirs:
-    #        gs_dirs.append(program_files)
-
     # That's enough search paths -- now start looking
     for gs_dir in gs_dirs:
         for dirpath, dirname, filenames in os.walk(gs_dir):
