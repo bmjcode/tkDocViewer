@@ -189,7 +189,7 @@ class DocViewer(tk.Frame, object):
         # Re-display text when the canvas is resized
         c.bind("<Configure>", self.refresh)
 
-        # Pass our remaining configuration options to Tk
+        # Process our remaining configuration options
         self.configure(**kw)
 
     def __setitem__(self, key, value):
