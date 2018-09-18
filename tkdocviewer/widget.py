@@ -16,11 +16,9 @@ except (ImportError):
 
 try:
     # Python 3
-    from tkinter import *
     import tkinter as tk
 except (ImportError):
     # Python 2
-    from Tkinter import *
     import Tkinter as tk
 
 try:
@@ -46,7 +44,7 @@ from .backend_gs import *
 __all__ = ["DocViewer"]
 
 
-class DocViewer(Frame, object):
+class DocViewer(tk.Frame, object):
     """Document viewer widget.
 
     The constructor accepts the usual Tkinter keyword arguments, plus
@@ -78,7 +76,7 @@ class DocViewer(Frame, object):
     def __init__(self, master=None, **kw):
         """Return a new DocViewer widget."""
 
-        Frame.__init__(self, master)
+        tk.Frame.__init__(self, master)
 
         # The currently displayed file path and pages
         self._display_path = None
@@ -87,7 +85,7 @@ class DocViewer(Frame, object):
         # Used to track whether we are currently rendering a page.
         # Watch this with wait_variable() if you need to do anything
         # to the displayed file after it's been rendered.
-        self._rendering = BooleanVar()
+        self._rendering = tk.BooleanVar()
         self._rendering.set(0)
 
         # Storage for rendered pages
@@ -102,7 +100,7 @@ class DocViewer(Frame, object):
         self._y_offset = 0
 
         # Whether to enable downscaling for PDF files
-        self._enable_downscaling = BooleanVar()
+        self._enable_downscaling = tk.BooleanVar()
         if "enable_downscaling" in kw:
             self._enable_downscaling.set(kw["enable_downscaling"])
             del kw["enable_downscaling"]
@@ -110,7 +108,7 @@ class DocViewer(Frame, object):
             self._enable_downscaling.set(0)
 
         # Whether to force unrecognized file types to display as plain text
-        self._force_text_display = BooleanVar()
+        self._force_text_display = tk.BooleanVar()
         if "force_text_display" in kw:
             self._force_text_display.set(kw["force_text_display"])
             del kw["force_text_display"]
@@ -142,7 +140,7 @@ class DocViewer(Frame, object):
             Scrollbar = tk.Scrollbar
 
         # Whether to wrap long text lines for display
-        self._wrap_text = BooleanVar()
+        self._wrap_text = tk.BooleanVar()
         if "wrap_text" in kw:
             self._wrap_text.set(kw["wrap_text"])
             del kw["wrap_text"]
@@ -156,8 +154,8 @@ class DocViewer(Frame, object):
             self["borderwidth"] = 1
 
         # Canvas widget to display the document
-        c = self._canvas = Canvas(self,
-                                  takefocus=1)
+        c = self._canvas = tk.Canvas(self,
+                                     takefocus=1)
 
         # Forward focus events to the canvas
         self.focus_set = self._canvas.focus_set
@@ -210,7 +208,7 @@ class DocViewer(Frame, object):
 
         else:
             # Handle everything else normally
-            Frame.configure(self, **{key: value})
+            tk.Frame.configure(self, **{key: value})
 
     # ------------------------------------------------------------------------
 
@@ -245,7 +243,7 @@ class DocViewer(Frame, object):
             return self._canvas.cget(key)
 
         else:
-            return Frame.cget(self, key)
+            return tk.Frame.cget(self, key)
 
     # Also override this alias for cget()
     __getitem__ = cget
@@ -270,7 +268,7 @@ class DocViewer(Frame, object):
         """Destroy this and all descendants widgets."""
 
         self.cancel_rendering()
-        return Frame.destroy(self)
+        return tk.Frame.destroy(self)
 
     def display_file(self, path, pages=None):
         """Display the specified file.
@@ -409,13 +407,13 @@ class DocViewer(Frame, object):
             # Tkinter can display
             page_image = PIL.ImageTk.PhotoImage(image_data)
 
-        elif isinstance(image_data, PhotoImage):
+        elif isinstance(image_data, tk.PhotoImage):
             # This is a Tkinter PhotoImage
             page_image = image_data
 
         else:
             # Presume we're working with raw image data
-            page_image = PhotoImage(data=image_data)
+            page_image = tk.PhotoImage(data=image_data)
 
         # Save a reference to this image
         self._rendered_pages.append(page_image)
@@ -462,7 +460,7 @@ class DocViewer(Frame, object):
             # Still waiting on the next item
             pass
 
-        except (TclError):
+        except (tk.TclError):
             # Has the widget ceased to exist?
             pass
 
