@@ -35,10 +35,10 @@ except (ImportError):
     have_ttk = False
 
 try:
-    from PIL import Image, ImageTk
-    have_pil = True
+    import PIL.Image
+    import PIL.ImageTk
 except (ImportError):
-    have_pil = False
+    PIL = None
 
 from .backend_gs import *
 
@@ -401,10 +401,10 @@ class DocViewer(Frame, object):
 
         c = self._canvas
 
-        if have_pil and isinstance(image_data, Image.Image):
+        if PIL and isinstance(image_data, PIL.Image.Image):
             # This is an image processed by PIL, so convert it to something
             # Tkinter can display
-            page_image = ImageTk.PhotoImage(image_data)
+            page_image = PIL.ImageTk.PhotoImage(image_data)
 
         elif isinstance(image_data, PhotoImage):
             # This is a Tkinter PhotoImage
@@ -507,9 +507,9 @@ class DocViewer(Frame, object):
     def _render_image(self, path):
         """Render an image file."""
 
-        if have_pil:
+        if PIL:
             try:
-                im = Image.open(path)
+                im = PIL.Image.open(path)
                 self._add_page_to_canvas(im)
 
             except (Exception) as err:

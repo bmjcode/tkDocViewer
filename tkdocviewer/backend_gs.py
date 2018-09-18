@@ -9,6 +9,7 @@ import os
 import sys
 import subprocess
 import threading
+import io
 
 # Used for conversion of Postscript to PDF
 import tempfile
@@ -16,11 +17,9 @@ import shutil
 
 # Downscaling support requires PIL
 try:
-    from PIL import Image
-    from io import BytesIO
-    can_downscale = True
+    import PIL
 except (ImportError):
-    can_downscale = False
+    PIL = None
 
 # ------------------------------------------------------------------------
 
@@ -133,7 +132,7 @@ class GhostscriptThread(threading.Thread):
             self.enable_downscaling = False
 
         # Determine what resolution Ghostscript should run at
-        if can_downscale and self.enable_downscaling:
+        if PIL and self.enable_downscaling:
             self.gs_res = hr_dpi
         else:
             self.gs_res = gs_dpi
@@ -362,15 +361,15 @@ class GhostscriptThread(threading.Thread):
 
             # If we're using downscaling, use PIL to resize
             # the output from Ghostscript for display
-            if can_downscale and self.enable_downscaling:
-                page_bytes = BytesIO(page_data)
-                page_image = Image.open(page_bytes)
+            if PIL and self.enable_downscaling:
+                page_bytes = io.BytesIO(page_data)
+                page_image = PIL.Image.open(page_bytes)
 
                 # Scale down the output from Ghostscript
                 w, h = page_image.size
                 page_image = page_image.resize((w * gs_dpi // hr_dpi,
                                                 h * gs_dpi // hr_dpi),
-                                               resample=Image.BICUBIC)
+                                               resample=PIL.Image.BICUBIC)
 
                 # Put the processed image data in the queue
                 self.queue.put(page_image)
