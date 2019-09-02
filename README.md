@@ -20,7 +20,8 @@ tkDocViewer consists of a single module, `tkdocviewer` (note the module name is 
 A brief example program:
 
 ```python
-# This assumes Python 3
+#!/usr/bin/env python3
+
 from tkinter import *
 from tkdocviewer import *
 
