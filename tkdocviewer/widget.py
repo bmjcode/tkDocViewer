@@ -119,13 +119,13 @@ class DocViewer(tk.Frame, object):
             del kw["scrollbars"]
 
             if not scrollbars:
-                scrollbars = self._default_scrollbars
-            elif not scrollbars in self._valid_scrollbars:
+                scrollbars = self._DEFAULT_SCROLLBARS
+            elif not scrollbars in self._VALID_SCROLLBARS:
                 raise ValueError("scrollbars parameter must be one of "
                                  "'vertical', 'horizontal', 'both', or "
                                  "'neither'")
         else:
-            scrollbars = self._default_scrollbars
+            scrollbars = self._DEFAULT_SCROLLBARS
 
         # Whether to use ttk widgets if available
         if "use_ttk" in kw:
@@ -193,7 +193,7 @@ class DocViewer(tk.Frame, object):
     def __setitem__(self, key, value):
         """Configure resources of a widget."""
 
-        if key in self._canvas_keys:
+        if key in self._CANVAS_KEYS:
             # Forward these to the canvas widget
             self._canvas.configure(**{key: value})
 
@@ -245,7 +245,7 @@ class DocViewer(tk.Frame, object):
     def cget(self, key):
         """Return the resource value for a KEY given as string."""
 
-        if key in self._canvas_keys:
+        if key in self._CANVAS_KEYS:
             return self._canvas.cget(key)
 
         else:
@@ -323,7 +323,7 @@ class DocViewer(tk.Frame, object):
         self.erase()
 
         # Display the message text
-        self._canvas.create_text(self._text_x_margin, self._text_y_margin,
+        self._canvas.create_text(self._TEXT_X_MARGIN, self._TEXT_Y_MARGIN,
                                  anchor="nw", tags="message",
                                  text=message, font=self.text_font)
         self.refresh()
@@ -379,7 +379,7 @@ class DocViewer(tk.Frame, object):
 
         if self._wrap_text.get():
             # Wrap the text to fit the canvas widget
-            text_width = c.winfo_width() - self._text_x_margin
+            text_width = c.winfo_width() - self._TEXT_X_MARGIN
             c.itemconfigure("message", width=text_width)
 
         else:
@@ -679,15 +679,15 @@ class DocViewer(tk.Frame, object):
     # ------------------------------------------------------------------------
 
     # Keys for configure() to forward to the canvas widget
-    _canvas_keys = "width", "height", "takefocus"
+    _CANVAS_KEYS = "width", "height", "takefocus"
 
     # Margins for displaying plain text on the canvas
-    _text_x_margin = 8
-    _text_y_margin = 8
+    _TEXT_X_MARGIN = 8
+    _TEXT_Y_MARGIN = 8
 
     # Scrollbar-related configuration
-    _default_scrollbars = "both"
-    _valid_scrollbars = "vertical", "horizontal", "both", "neither"
+    _DEFAULT_SCROLLBARS = "both"
+    _VALID_SCROLLBARS = "vertical", "horizontal", "both", "neither"
 
     # Recognized image extensions
     image_extensions = [".png", ".gif", ".jpg", ".jpeg"]
