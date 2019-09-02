@@ -59,6 +59,9 @@ class DocViewer(tk.Frame, object):
         Which scrollbars to provide.
         Must be one of "vertical", "horizontal," "both", or "neither".
 
+      text_font (tkinter.font.Font)
+        The default font used for plain text output.
+
       use_ttk (bool; default: False)
         Whether to use ttk widgets if available.
         The default is to use standard Tk widgets. This setting has
@@ -126,6 +129,13 @@ class DocViewer(tk.Frame, object):
                                  "'neither'")
         else:
             scrollbars = self._DEFAULT_SCROLLBARS
+
+        # Font for plain-text output
+        if "text_font" in kw:
+            self._text_font = kw["text_font"]
+            del kw["text_font"]
+        else:
+            self._text_font = self._DEFAULT_TEXT_FONT
 
         # Whether to use ttk widgets if available
         if "use_ttk" in kw:
@@ -325,7 +335,7 @@ class DocViewer(tk.Frame, object):
         # Display the message text
         self._canvas.create_text(self._TEXT_X_MARGIN, self._TEXT_Y_MARGIN,
                                  anchor="nw", tags="message",
-                                 text=message, font=self.text_font)
+                                 text=message, font=self._text_font)
         self.refresh()
 
         self.scroll_to_top()
@@ -681,6 +691,9 @@ class DocViewer(tk.Frame, object):
     # Keys for configure() to forward to the canvas widget
     _CANVAS_KEYS = "width", "height", "takefocus"
 
+    # Default font for plain-text output
+    _DEFAULT_TEXT_FONT = "Courier", 10
+
     # Margins for displaying plain text on the canvas
     _TEXT_X_MARGIN = 8
     _TEXT_Y_MARGIN = 8
@@ -694,9 +707,6 @@ class DocViewer(tk.Frame, object):
 
     # Recognized plain-text extensions
     text_extensions = [".txt"]
-
-    # Default font for plain-text output
-    text_font = "Courier", 10
 
     # Useful Ghostscript-related debugging information
     gs_executable = staticmethod(GhostscriptThread.gs_executable)
