@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """A document viewer widget for Tkinter.
 
 tkDocViewer is a document viewer widget for Python + Tkinter.

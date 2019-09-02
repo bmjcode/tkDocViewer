@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """Demonstration of the viewer widget."""
 
 import os

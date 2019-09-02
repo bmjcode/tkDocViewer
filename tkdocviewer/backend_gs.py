@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """Backend for rendering PDF documents using Ghostscript.
 
 This is an internal API and subject to change at any time.
