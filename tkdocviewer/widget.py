@@ -702,11 +702,18 @@ class DocViewer(tk.Frame, object):
     _DEFAULT_SCROLLBARS = "both"
     _VALID_SCROLLBARS = "vertical", "horizontal", "both", "neither"
 
+    # ------------------------------------------------------------------------
+
+    # These values are technically user-customizable, but this is considered
+    # an undocumented feature, and may be removed from a future release.
+
     # Recognized image extensions
     image_extensions = [".png", ".gif", ".jpg", ".jpeg"]
 
     # Recognized plain-text extensions
     text_extensions = [".txt"]
+
+    # ------------------------------------------------------------------------
 
     # Useful Ghostscript-related debugging information
     gs_executable = staticmethod(GhostscriptThread.gs_executable)
