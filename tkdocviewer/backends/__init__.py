@@ -1,5 +1,8 @@
 """Backends for rendering various file types.
 
+A backend processes an input file and returns image data that the
+user interface code can display.
+
 These are internal APIs and subject to change at any time.
 """
 

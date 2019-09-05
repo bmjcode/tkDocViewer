@@ -7,6 +7,36 @@ import sys
 import subprocess
 
 
+class Backend(object):
+    """Base class for tkDocViewer backends."""
+
+    __slots__ = ["input_path"]
+
+    def __init__(self, input_path):
+        """Return a new rendering backend."""
+
+        self.input_path = input_path
+
+    def page_count(self):
+        """Return the number of pages in the input file.
+
+        Override this in your subclass.
+        """
+
+        raise NotImplementedError
+
+    def render_page(self, page_num, **kw):
+        """Render the specified page of the input file.
+
+        This should return image data that the UI code can process.
+        Supported keyword arguments are defined by each backend.
+
+        Override this in your subclass.
+        """
+
+        raise NotImplementedError
+
+
 class BackendError(Exception):
     """Exception representing an error in one of the rendering backends."""
     pass

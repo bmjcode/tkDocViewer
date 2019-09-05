@@ -19,7 +19,8 @@ try:
 except (ImportError):
     PIL = None
 
-from .shared import BackendError, bytes_to_str, check_output, string_type
+from .shared import (Backend, BackendError,
+                     bytes_to_str, check_output, string_type)
 
 # ------------------------------------------------------------------------
 
@@ -93,6 +94,109 @@ hr_dpi = 2 * gs_dpi     # resolution used internally for high quality
 __all__ = ["GhostscriptThread", "gs_dpi"]
 
 
+class GhostscriptBackend(Backend):
+    """Backend to render a document using Ghostscript."""
+
+    __slots__ = []
+
+    def page_count(self):
+        """Return the number of pages in the input file.
+
+        This function only directly supports PDF files; other file
+        types supported by Ghostscript must be converted first.
+        """
+
+        base, ext = os.path.splitext(self.input_path)
+        if ext.lower() != ".pdf":
+            raise BackendError("Only PDF files are supported.")
+
+        # The Ghostscript interpreter expects forward slashes in file paths
+        gs_input_path = self.input_path.replace(os.sep, "/")
+
+        # Ghostscript command to return the page count of a PDF file
+        gs_pc_command = "({0}) (r) file runpdfbegin pdfpagecount = quit"
+
+        # Ghostscript command line
+        gs_args = [gs_exe,
+                   "-q",
+                   "-dNODISPLAY",
+                   "-c",
+                   gs_pc_command.format(gs_input_path)]
+
+        # Return the page count if it's a valid PDF, or None otherwise
+        return int(check_output(gs_args))
+
+    def render_page(self, page_num, **kw):
+        """Render the specified page of the input file.
+
+        This function only directly supports PDF files; other file
+        types supported by Ghostscript must be converted first.
+
+        Supported keyword arguments:
+        res -- the resolution for rendering the file.
+        """
+
+        base, ext = os.path.splitext(self.input_path)
+        if ext.lower() != ".pdf":
+            raise BackendError("Only PDF files are supported.")
+
+        # Ghostscript command line
+        gs_args = [gs_exe,
+                   "-q",
+                   "-dBATCH",
+                   "-dNOPAUSE",
+                   "-dSAFER",
+                   "-dPDFSettings=/SCREEN",
+                   "-dPrinted=false",
+                   "-dTextAlphaBits=4",
+                   "-dGraphicsAlphaBits=4",
+                   "-dCOLORSCREEN",
+                   "-dDOINTERPOLATE",
+
+                   # Newer versions of Ghostscript support the -sPageList
+                   # option, but our user's version might not have it.
+                   # This approach is clumsier, but backwards-compatible.
+                   "-dFirstPage={0}".format(page_num),
+                   "-dLastPage={0}".format(page_num),
+
+                   # Raw PPM is the only full-color image format that all
+                   # versions of Tk are guaranteed to support.
+                   "-sDEVICE=ppmraw",
+                   "-sOutputFile=-",
+                   self.input_path]
+
+        # Resolution for rendering the file
+        if "res" in kw:
+            gs_args.insert(2, "-r{0}".format(kw["res"]))
+
+        # Call Ghostscript to render the PDF
+        return check_output(gs_args)
+
+    def render_to_pdf(self, output_path):
+        """Render the input file to PDF."""
+
+        # Sanity checks
+        if output_path == self.input_path:
+            raise BackendError("Input and output must be separate files.")
+        elif output_path == "-":
+            raise BackendError("Rendering to stdout is not supported.")
+        elif not output_path:
+            raise BackendError("You must provide an output path.")
+
+        # Ghostscript command line
+        gs_args = [gs_exe,
+                   "-q",
+                   "-dBATCH",
+                   "-dNOPAUSE",
+                   "-dSAFER",
+                   "-sDEVICE=pdfwrite",
+                   "-sOutputFile={0}".format(output_path),
+                   self.input_path]
+
+        # Call Ghostscript to convert the file
+        check_output(gs_args)
+
+
 class GhostscriptThread(threading.Thread):
     """Thread to render a document using Ghostscript."""
 
@@ -105,6 +209,9 @@ class GhostscriptThread(threading.Thread):
         self.canceler = canceler
         self.path = path
         self.pages = pages
+
+        # Save this name for our Ghostscript backend
+        self.gs = None
 
         # Whether to enable downscaling
         # This has no effect if PIL is not available on your system.
@@ -119,11 +226,6 @@ class GhostscriptThread(threading.Thread):
         else:
             self.gs_res = gs_dpi
 
-        # The file path we actually pass to Ghostscript
-        # If self.path doesn't specify a PDF file, we convert it first
-        # since we need to be able to process individual PDF pages.
-        self.gs_input_path = self.path
-
     # ------------------------------------------------------------------------
 
     def run(self):
@@ -134,77 +236,28 @@ class GhostscriptThread(threading.Thread):
             self._push_error("File does not exist: {0}".format(self.path))
             return
 
-        base, ext = os.path.splitext(self.path)
-
-        if ext.lower() == ".pdf":
-            self._render_pdf()
-
-        elif ext.lower() == ".ps":
-            self._render_ps()
-
-        else:
-            # DocViewer should have already caught this, but just in case...
-            self._push_error("Could not render file: {0}\n"
-                             "Unrecognized file type.".format(self.path))
-
-    # ------------------------------------------------------------------------
-
-    def _call_ghostscript(self, args):
-        """Call Ghostscript and return its output.
-
-        If Ghostscript cannot be found, pass an error message back
-        to the DocViewer widget via the queue.
-        """
-
         try:
-            return check_output(args)
+            base, ext = os.path.splitext(self.path)
+
+            if ext.lower() == ".pdf":
+                self._render_pdf()
+
+            elif ext.lower() == ".ps":
+                self._render_ps()
+
+            else:
+                # DocViewer should have already caught this, but just in case...
+                self._push_error("Could not render file: {0}\n"
+                                 "Unrecognized file type.".format(self.path))
 
         except (OSError):
-            # This likely indicates the Ghostscript executable was not found
+            # This indicates the Ghostscript executable was not found
             self._push_error("Could not render file: {0}\n"
                              "Please make sure you have Ghostscript ({1}) "
                              "installed somewhere on your system."
                              .format(self.path, ", ".join(gs_names)))
 
-    def _convert_to_pdf(self):
-        """Convert the specified file to PDF."""
-
-        # Make sure the input and output files aren't the same
-        if self.gs_input_path == self.path:
-            raise BackendError("self.path and self.gs_input_path "
-                               "must be different files")
-
-        # Ghostscript command line
-        gs_args = [gs_exe,
-                   "-q",
-                   "-dBATCH",
-                   "-dNOPAUSE",
-                   "-dSAFER",
-                   "-sDEVICE=pdfwrite",
-                   "-sOutputFile={0}".format(self.gs_input_path),
-                   self.path]
-
-        # Call Ghostscript to convert the file
-        self._call_ghostscript(gs_args)
-
-    def _page_count(self):
-        """Return the number of pages in this file."""
-
-        # Ghostscript wants forward slashes in file paths
-        gs_file_path = self.gs_input_path.replace(os.sep, "/")
-
-        # Ghostscript command to return the page count of a PDF file
-        gs_pc_command = "({0}) (r) file runpdfbegin pdfpagecount = quit"
-
-        # Ghostscript command line
-        gs_args = [gs_exe,
-                   "-q",
-                   "-dNODISPLAY",
-                   "-c",
-                   gs_pc_command.format(gs_file_path)]
-
-        # Return the page count if it's a valid PDF, or None otherwise
-        return int(self._call_ghostscript(gs_args))
+    # ------------------------------------------------------------------------
 
     def _parse_page_list(self):
         """Parse the list of pages to render."""
@@ -212,7 +265,7 @@ class GhostscriptThread(threading.Thread):
         pages = self.pages
 
         # Determine the page count
-        pc = self._page_count()
+        pc = self.gs.page_count()
 
         # Default to displaying all pages in the file
         # This is here, not in an else-clause, so we'll still be covered
@@ -311,34 +364,7 @@ class GhostscriptThread(threading.Thread):
             if self.canceler.is_set():
                 break
 
-            # Ghostscript command line
-            gs_args = [gs_exe,
-                       "-q",
-                       "-r{0}".format(self.gs_res),
-                       "-dBATCH",
-                       "-dNOPAUSE",
-                       "-dSAFER",
-                       "-dPDFSettings=/SCREEN",
-                       "-dPrinted=false",
-                       "-dTextAlphaBits=4",
-                       "-dGraphicsAlphaBits=4",
-                       "-dCOLORSCREEN",
-                       "-dDOINTERPOLATE",
-
-                       # Newer versions of Ghostscript support the -sPageList
-                       # option, but our user's version might not have it.
-                       # This approach is clumsier, but backwards-compatible.
-                       "-dFirstPage={0}".format(page),
-                       "-dLastPage={0}".format(page),
-
-                       # We use raw PPM here because it's the only full-color
-                       # image format all versions of Tk support.
-                       "-sDEVICE=ppmraw",
-                       "-sOutputFile=-",
-                       self.gs_input_path]
-
-            # Call Ghostscript to render the PDF
-            page_data = self._call_ghostscript(gs_args)
+            page_data = self.gs.render_page(page, res=self.gs_res)
 
             # If we're using downscaling, use PIL to resize
             # the output from Ghostscript for display
@@ -359,8 +385,13 @@ class GhostscriptThread(threading.Thread):
                 # Put the raw PPM data from Ghostscript in the queue
                 self.queue.put(page_data)
 
-    def _render_pdf(self):
+    def _render_pdf(self, input_path=None):
         """Render the specified PDF file."""
+
+        if not input_path:
+            input_path = self.path
+
+        self.gs = GhostscriptBackend(input_path)
 
         try:
             # Identify which pages to display
@@ -387,11 +418,15 @@ class GhostscriptThread(threading.Thread):
             # We can't render individual pages from a Postscript file, so
             # we have to convert it to PDF first. This is both inefficient
             # and, given Ghostscript's intended purpose, deeply ironic.
-            self.gs_input_path = os.path.join(temp_dir, "render.pdf")
+            pdf_output_path = os.path.join(temp_dir, "render.pdf")
 
             try:
-                self._convert_to_pdf()
-                self._render_pdf()
+                # Convert the original file to a PDF
+                gs = GhostscriptBackend(self.path)
+                gs.render_to_pdf(pdf_output_path)
+
+                # Render the converted PDF file
+                self._render_pdf(pdf_output_path)
 
             except (Exception) as err:
                 self._push_error(err)
