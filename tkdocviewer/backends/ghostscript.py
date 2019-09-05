@@ -19,7 +19,7 @@ try:
 except (ImportError):
     PIL = None
 
-from .shared import BackendError, bytes_to_str, string_type
+from .shared import BackendError, bytes_to_str, check_output, string_type
 
 # ------------------------------------------------------------------------
 
@@ -157,7 +157,7 @@ class GhostscriptThread(threading.Thread):
         """
 
         try:
-            return self._real_call_ghostscript(args)
+            return check_output(args)
 
         except (OSError):
             # This likely indicates the Ghostscript executable was not found
@@ -402,30 +402,6 @@ class GhostscriptThread(threading.Thread):
     # ------------------------------------------------------------------------
 
     @staticmethod
-    def _real_call_ghostscript(args):
-        """Call Ghostscript and return its output."""
-
-        # Standard keyword arguments for subprocess.check_output()
-        subprocess_kw = {
-            "stdin": subprocess.PIPE,
-            "stderr": subprocess.PIPE,
-            "shell": False,
-        }
-
-        if sys.platform.startswith("win"):
-            # Hide Ghostscript's console window when running under pythonw.exe
-            #
-            # Note: A new STARTUPINFO has to be created for each call to
-            # subprocess.check_output().
-            gs_si = subprocess.STARTUPINFO()
-            gs_si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            gs_si.wShowWindow = subprocess.SW_HIDE
-
-            subprocess_kw["startupinfo"] = gs_si
-
-        return subprocess.check_output(args, **subprocess_kw)
-
-    @staticmethod
     def gs_executable():
         """Return the path to the Ghostscript executable."""
 
@@ -441,11 +417,9 @@ class GhostscriptThread(threading.Thread):
     def gs_version():
         """Return the version of the Ghostscript executable."""
 
-        call_ghostscript = GhostscriptThread._real_call_ghostscript
-
         try:
             # Return the version number, minus the trailing newline
-            gs_ver = call_ghostscript([gs_exe, "--version"])[:-1]
+            gs_ver = check_output([gs_exe, "--version"])[:-1]
             return bytes_to_str(gs_ver)
 
         except (OSError):
