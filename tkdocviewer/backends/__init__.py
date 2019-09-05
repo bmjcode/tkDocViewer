@@ -11,3 +11,11 @@ from .shared import Backend, BackendError
 
 # Individual backends, in alphabetical order
 from .ghostscript import GhostscriptBackend, GhostscriptThread, gs_dpi
+
+__all__ = [
+    "Backend",
+    "BackendError",
+    "GhostscriptBackend",
+    "GhostscriptThread",
+    "gs_dpi"
+]
