@@ -36,7 +36,7 @@ try:
 except (ImportError):
     PIL = None
 
-from .backends import GhostscriptThread, gs_dpi
+from .backends import GhostscriptBackend, GhostscriptThread, gs_dpi
 
 
 __all__ = ["DocViewer"]
@@ -716,6 +716,6 @@ class DocViewer(tk.Frame, object):
     # ------------------------------------------------------------------------
 
     # Useful Ghostscript-related debugging information
-    gs_executable = staticmethod(GhostscriptThread.gs_executable)
-    gs_search_path = staticmethod(GhostscriptThread.gs_search_path)
-    gs_version = staticmethod(GhostscriptThread.gs_version)
+    gs_executable = staticmethod(GhostscriptBackend.gs_executable)
+    gs_search_path = staticmethod(GhostscriptBackend.gs_search_path)
+    gs_version = staticmethod(GhostscriptBackend.gs_version)

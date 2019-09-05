@@ -196,6 +196,33 @@ class GhostscriptBackend(Backend):
         # Call Ghostscript to convert the file
         check_output(gs_args)
 
+    # ------------------------------------------------------------------------
+
+    @staticmethod
+    def gs_executable():
+        """Return the path to the Ghostscript executable."""
+
+        return gs_exe
+
+    @staticmethod
+    def gs_search_path():
+        """Return the search path for the Ghostscript executable."""
+
+        return gs_dirs
+
+    @staticmethod
+    def gs_version():
+        """Return the version of the Ghostscript executable."""
+
+        try:
+            # Return the version number, minus the trailing newline
+            gs_ver = check_output([gs_exe, "--version"])[:-1]
+            return bytes_to_str(gs_ver)
+
+        except (OSError):
+            # No Ghostscript executable was found
+            return None
+
 
 class GhostscriptThread(threading.Thread):
     """Thread to render a document using Ghostscript."""
@@ -433,30 +460,3 @@ class GhostscriptThread(threading.Thread):
 
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
-
-    # ------------------------------------------------------------------------
-
-    @staticmethod
-    def gs_executable():
-        """Return the path to the Ghostscript executable."""
-
-        return gs_exe
-
-    @staticmethod
-    def gs_search_path():
-        """Return the search path for the Ghostscript executable."""
-
-        return gs_dirs
-
-    @staticmethod
-    def gs_version():
-        """Return the version of the Ghostscript executable."""
-
-        try:
-            # Return the version number, minus the trailing newline
-            gs_ver = check_output([gs_exe, "--version"])[:-1]
-            return bytes_to_str(gs_ver)
-
-        except (OSError):
-            # No Ghostscript executable was found
-            return None
