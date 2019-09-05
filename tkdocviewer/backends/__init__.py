@@ -7,7 +7,7 @@ These are internal APIs and subject to change at any time.
 """
 
 # Shared items for public export
-from .shared import BackendError
+from .shared import Backend, BackendError
 
 # Individual backends, in alphabetical order
-from .ghostscript import GhostscriptThread, gs_dpi
+from .ghostscript import GhostscriptBackend, GhostscriptThread, gs_dpi
