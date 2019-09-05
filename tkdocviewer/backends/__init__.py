@@ -2,4 +2,8 @@
 
 These are internal APIs and subject to change at any time."""
 
-from .ghostscript import GhostscriptThread, GhostscriptError, gs_dpi
+# Shared items for public export
+from .shared import BackendError
+
+# Individual backends, in alphabetical order
+from .ghostscript import GhostscriptThread, gs_dpi

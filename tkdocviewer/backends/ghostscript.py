@@ -19,12 +19,7 @@ try:
 except (ImportError):
     PIL = None
 
-# ------------------------------------------------------------------------
-
-# On Python 2, basestring is the superclass for ASCII and Unicode strings.
-# On Python 3, all strings are Unicode and basestring is not defined.
-try: string_type = basestring
-except (NameError): string_type = str
+from .shared import BackendError, bytes_to_str, string_type
 
 # ------------------------------------------------------------------------
 
@@ -95,18 +90,7 @@ gs_dpi = 96             # resolution for the actual displayed preview
 hr_dpi = 2 * gs_dpi     # resolution used internally for high quality
 
 
-__all__ = ["GhostscriptThread", "GhostscriptError", "gs_dpi"]
-
-
-def _bytes_to_str(value):
-    """Convert bytes to str."""
-
-    if isinstance(value, bytes) and not isinstance(value, str):
-        # Clumsy way to convert bytes to str on Python 3
-        return "".join(map(chr, value))
-
-    else:
-        return value
+__all__ = ["GhostscriptThread", "gs_dpi"]
 
 
 class GhostscriptThread(threading.Thread):
@@ -187,8 +171,8 @@ class GhostscriptThread(threading.Thread):
 
         # Make sure the input and output files aren't the same
         if self.gs_input_path == self.path:
-            raise GhostscriptError("self.path and self.gs_input_path "
-                                   "must be different files")
+            raise BackendError("self.path and self.gs_input_path "
+                               "must be different files")
 
         # Ghostscript command line
         gs_args = [gs_exe,
@@ -286,7 +270,7 @@ class GhostscriptThread(threading.Thread):
             # the call to Ghostscript
             if isinstance(err, subprocess.CalledProcessError) and err.output:
                 # Display the output from Ghostscript
-                message = _bytes_to_str(err.output)[:-1]
+                message = bytes_to_str(err.output)[:-1]
 
                 # Quote command line arguments containing spaces
                 args = []
@@ -311,7 +295,7 @@ class GhostscriptThread(threading.Thread):
 
         # Put the exception into the queue and let DocViewer process it
         # in the main thread
-        self.queue.put(GhostscriptError(message))
+        self.queue.put(BackendError(message))
 
     def _render_pages(self, display_pages):
         """Render pages using Ghostscript.
@@ -462,14 +446,8 @@ class GhostscriptThread(threading.Thread):
         try:
             # Return the version number, minus the trailing newline
             gs_ver = call_ghostscript([gs_exe, "--version"])[:-1]
-            return _bytes_to_str(gs_ver)
+            return bytes_to_str(gs_ver)
 
         except (OSError):
             # No Ghostscript executable was found
             return None
-
-
-class GhostscriptError(Exception):
-    """Exception representing a Ghostscript-related error."""
-
-    pass

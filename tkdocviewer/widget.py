@@ -36,7 +36,7 @@ try:
 except (ImportError):
     PIL = None
 
-from .backends import GhostscriptThread, GhostscriptError, gs_dpi
+from .backends import GhostscriptThread, gs_dpi
 
 
 __all__ = ["DocViewer"]
