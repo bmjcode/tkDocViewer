@@ -77,9 +77,3 @@ def check_output(args):
         subprocess_kw["startupinfo"] = gs_si
 
     return subprocess.check_output(args, **subprocess_kw)
-
-
-# On Python 2, basestring is the superclass for ASCII and Unicode strings.
-# On Python 3, all strings are Unicode and basestring is not defined.
-try: string_type = basestring
-except (NameError): string_type = str

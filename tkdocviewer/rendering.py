@@ -5,56 +5,61 @@ These are internal APIs and subject to change at any time.
 
 import os
 import threading
-import io
-import subprocess
 
 # Used for conversion of Postscript to PDF
 import tempfile
-import shutil
 
-# Downscaling support requires PIL
-try:
-    import PIL
-except (ImportError):
-    PIL = None
-
-from .backends import GhostscriptBackend, gs_dpi
-from .backends.shared import string_type
+from .backends import GhostscriptBackend
 
 
-class GhostscriptThread(threading.Thread):
-    """Thread to render a document using Ghostscript."""
+# On Python 2, basestring is the superclass for ASCII and Unicode strings.
+# On Python 3, all strings are Unicode and basestring is not defined.
+try: string_type = basestring
+except (NameError): string_type = str
 
-    def __init__(self, queue, canceler, path, pages=None, **kw):
-        """Return a new Ghostscript process thread."""
+
+class RenderingThread(threading.Thread):
+    """Thread to run a rendering operation in the background."""
+
+    __slots__ = ["backend", "backend_cls",
+                 "queue", "canceler", "path", "pages",
+                 "render_kw", "temp_files"]
+
+    def __init__(self, backend_cls, queue, canceler, path, pages=None, **kw):
+        """Return a new rendering thread."""
 
         threading.Thread.__init__(self)
 
+        # Rendering backend; created by self.create_backend()
+        self.backend = None
+
+        # Standard arguments
+        self.backend_cls = backend_cls
         self.queue = queue
         self.canceler = canceler
         self.path = path
         self.pages = pages
 
-        # Save this name for our Ghostscript backend
-        self.gs = None
+        # Optional keyword arguments for self.backend.render_page()
+        self.render_kw = {}
 
-        # Whether to enable downscaling
-        # This has no effect if PIL is not available on your system.
-        if "enable_downscaling" in kw:
-            self.enable_downscaling = kw["enable_downscaling"]
-        else:
-            self.enable_downscaling = False
-
-        # Determine what resolution Ghostscript should run at
-        if PIL and self.enable_downscaling:
-            self.gs_res = hr_dpi
-        else:
-            self.gs_res = gs_dpi
+        # Temporary files to clean up after rendering; not used by the
+        # standard RenderingThread, but may be necessary for subclasses
+        self.temp_files = []
 
     # ------------------------------------------------------------------------
 
+    def create_backend(self):
+        """Create a backend for rendering the input file.
+
+        Your subclass can override this if you need to do special
+        pre-processing, such as converting to a different file type.
+        """
+
+        self.backend = self.backend_cls(self.path)
+
     def run(self):
-        """Render the specified file."""
+        """Render the file."""
 
         # Sanity check: Make sure the file actually exists before continuing.
         if not os.path.isfile(self.path):
@@ -62,25 +67,31 @@ class GhostscriptThread(threading.Thread):
             return
 
         try:
-            base, ext = os.path.splitext(self.path)
+            # Create a backend instance to render pages
+            self.create_backend()
 
-            if ext.lower() == ".pdf":
-                self._render_pdf()
+            for page in self._parse_page_list():
+                if self.canceler.is_set():
+                    # Halt further processing
+                    break
 
-            elif ext.lower() == ".ps":
-                self._render_ps()
+                # Render the page
+                image_data = self.backend.render_page(page, **self.render_kw)
 
-            else:
-                # DocViewer should have already caught this, but just in case...
-                self._push_error("Could not render file: {0}\n"
-                                 "Unrecognized file type.".format(self.path))
+                # Pass the image data to the DocViewer widget
+                self.queue.put(image_data)
 
-        except (OSError):
-            # This indicates the Ghostscript executable was not found
-            self._push_error("Could not render file: {0}\n"
-                             "Please make sure you have Ghostscript ({1}) "
-                             "installed somewhere on your system."
-                             .format(self.path, ", ".join(gs_names)))
+            # Signal we are done rendering this file
+            self.queue.put(None)
+
+        except (Exception) as err:
+            # Forward the error message to the UI thread
+            self._push_error(err)
+
+        finally:
+            # Clean up temporary files
+            for path in self.temp_files:
+                os.remove(path)
 
     # ------------------------------------------------------------------------
 
@@ -90,7 +101,7 @@ class GhostscriptThread(threading.Thread):
         pages = self.pages
 
         # Determine the page count
-        pc = self.gs.page_count()
+        pc = self.backend.page_count()
 
         # Default to displaying all pages in the file
         # This is here, not in an else-clause, so we'll still be covered
@@ -144,28 +155,8 @@ class GhostscriptThread(threading.Thread):
             message = err
 
         elif isinstance(err, Exception):
-            # A CalledProcessError indicates something went wrong with
-            # the call to Ghostscript
-            if isinstance(err, subprocess.CalledProcessError) and err.output:
-                # Display the output from Ghostscript
-                message = bytes_to_str(err.output)[:-1]
-
-                # Quote command line arguments containing spaces
-                args = []
-                for arg in err.cmd:
-                    if " " in arg:
-                        args.append('"{0}"'.format(arg))
-                    else:
-                        args.append(arg)
-
-                # Append the Ghostscript command line and return value
-                message += ("\n\n"
-                            "Ghostscript command line (return code = {0}):\n"
-                            "{1}").format(err.returncode, " ".join(args))
-
-            else:
-                # Format err as a generic exception
-                message = "{0}".format(err)
+            # Process err as an exception
+            message = str(err)
 
         else:
             # This should never happen
@@ -173,88 +164,54 @@ class GhostscriptThread(threading.Thread):
 
         # Put the exception into the queue and let DocViewer process it
         # in the main thread
-        self.queue.put(BackendError(message))
+        self.queue.put(RenderingThreadError(message))
 
-    def _render_pages(self, display_pages):
-        """Render pages using Ghostscript.
 
-        The rendered pages are passed to the DocViewer widget via the queue.
-        """
+class GhostscriptThread(RenderingThread):
+    """Thread to render a document using Ghostscript."""
 
-        # Putting the for loop here, so there is only one call to
-        # self._render_pages(), is an optimization because Python
-        # method calls are expensive.
-        for page in display_pages:
-            # Halt processing if the canceler has been set
-            if self.canceler.is_set():
-                break
+    def __init__(self, queue, canceler, path, pages=None, **kw):
+        """Return a new Ghostscript process thread."""
 
-            page_data = self.gs.render_page(page, res=self.gs_res)
+        RenderingThread.__init__(self, GhostscriptBackend,
+                                 queue, canceler, path, pages)
 
-            # If we're using downscaling, use PIL to resize
-            # the output from Ghostscript for display
-            if PIL and self.enable_downscaling:
-                page_bytes = io.BytesIO(page_data)
-                page_image = PIL.Image.open(page_bytes)
+        # Whether to enable downscaling
+        if "enable_downscaling" in kw:
+            self.render_kw["enable_downscaling"] = kw["enable_downscaling"]
 
-                # Scale down the output from Ghostscript
-                w, h = page_image.size
-                page_image = page_image.resize((w * gs_dpi // hr_dpi,
-                                                h * gs_dpi // hr_dpi),
-                                               resample=PIL.Image.BICUBIC)
+    # ------------------------------------------------------------------------
 
-                # Put the processed image data in the queue
-                self.queue.put(page_image)
+    def create_backend(self):
+        """Create a backend for rendering the input file."""
 
-            else:
-                # Put the raw PPM data from Ghostscript in the queue
-                self.queue.put(page_data)
+        base, ext = os.path.splitext(self.path)
 
-    def _render_pdf(self, input_path=None):
-        """Render the specified PDF file."""
+        if ext.lower() == ".pdf":
+            # Render PDF files directly
+            self.backend = self.backend_cls(self.path)
 
-        if not input_path:
-            input_path = self.path
+        elif ext.lower() == ".ps":
+            # We can't render individual pages from Postscript files,
+            # so convert them to PDF first
+            fd, pdf_path = tempfile.mkstemp(suffix=".pdf")
+            os.close(fd)
 
-        self.gs = GhostscriptBackend(input_path)
+            pdf_backend = GhostscriptBackend(self.path)
+            pdf_backend.render_to_pdf(pdf_path)
 
-        try:
-            # Identify which pages to display
-            display_pages = self._parse_page_list()
+            # Render the converted PDF file
+            self.backend = self.backend_cls(pdf_path)
 
-            # Render pages
-            self._render_pages(display_pages)
+            # Clean up the temporary file after exiting
+            self.temp_files.append(pdf_path)
 
-            # Signal we are done rendering this file
-            self.queue.put(None)
+        else:
+            # This should never happen
+            raise RenderingThreadError("Could not render {0}: unrecognized "
+                                       "file extension.".format(self.path))
 
-        except (Exception) as err:
-            # Forward the error message to the UI thread
-            self._push_error(err)
 
-    def _render_ps(self):
-        """Render the specified Postscript file."""
-
-        # tempfile.TemporaryDirectory() provides a nicer interface,
-        # but is only available on Python 3.
-        temp_dir = tempfile.mkdtemp()
-
-        try:
-            # We can't render individual pages from a Postscript file, so
-            # we have to convert it to PDF first. This is both inefficient
-            # and, given Ghostscript's intended purpose, deeply ironic.
-            pdf_output_path = os.path.join(temp_dir, "render.pdf")
-
-            try:
-                # Convert the original file to a PDF
-                gs = GhostscriptBackend(self.path)
-                gs.render_to_pdf(pdf_output_path)
-
-                # Render the converted PDF file
-                self._render_pdf(pdf_output_path)
-
-            except (Exception) as err:
-                self._push_error(err)
-
-        finally:
-            shutil.rmtree(temp_dir, ignore_errors=True)
+class RenderingThreadError(Exception):
+    """Exception representing an error in a rendering thread."""
+    pass

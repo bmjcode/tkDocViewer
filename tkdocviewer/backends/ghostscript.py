@@ -5,6 +5,14 @@ This is an internal API and subject to change at any time.
 
 import os
 import sys
+import subprocess
+import io
+
+# Downscaling support requires PIL
+try:
+    import PIL
+except (ImportError):
+    PIL = None
 
 from .shared import Backend, BackendError, bytes_to_str, check_output
 
@@ -73,11 +81,13 @@ else:
 
 # Resolution for Ghostscript rendering (in dots per inch)
 # TODO: This should not be hard-coded, but queried at runtime.
-gs_dpi = 96             # resolution for the actual displayed preview
-hr_dpi = 2 * gs_dpi     # resolution used internally for high quality
+gs_dpi = 96
+
+# Resolution used internally when downscaling is enabled
+hr_dpi = 2 * gs_dpi
 
 
-__all__ = ["GhostscriptThread", "gs_dpi"]
+__all__ = ["GhostscriptBackend", "GhostscriptNotAvailable", "gs_dpi"]
 
 
 class GhostscriptBackend(Backend):
@@ -110,7 +120,7 @@ class GhostscriptBackend(Backend):
                    gs_pc_command.format(gs_input_path)]
 
         # Return the page count if it's a valid PDF, or None otherwise
-        return int(check_output(gs_args))
+        return int(self._check_output(gs_args))
 
     def render_page(self, page_num, **kw):
         """Render the specified page of the input file.
@@ -119,16 +129,30 @@ class GhostscriptBackend(Backend):
         types supported by Ghostscript must be converted first.
 
         Supported keyword arguments:
-        res -- the resolution for rendering the file.
+        enable_downscaling -- whether to enable downscaling using PIL.
         """
 
         base, ext = os.path.splitext(self.input_path)
         if ext.lower() != ".pdf":
             raise BackendError("Only PDF files are supported.")
 
+        # Whether to enable downscaling
+        # This has no effect if PIL is not available on your system.
+        if "enable_downscaling" in kw:
+            enable_downscaling = kw["enable_downscaling"]
+        else:
+            enable_downscaling = False
+
+        # Resolution for Ghostscript rendering
+        if PIL and enable_downscaling:
+            gs_res = hr_dpi
+        else:
+            gs_res = gs_dpi
+
         # Ghostscript command line
         gs_args = [gs_exe,
                    "-q",
+                   "-r{0}".format(gs_res),
                    "-dBATCH",
                    "-dNOPAUSE",
                    "-dSAFER",
@@ -151,12 +175,22 @@ class GhostscriptBackend(Backend):
                    "-sOutputFile=-",
                    self.input_path]
 
-        # Resolution for rendering the file
-        if "res" in kw:
-            gs_args.insert(2, "-r{0}".format(kw["res"]))
-
         # Call Ghostscript to render the PDF
-        return check_output(gs_args)
+        image_data = self._check_output(gs_args)
+
+        if PIL and enable_downscaling:
+            page_bytes = io.BytesIO(image_data)
+            page_image = PIL.Image.open(page_bytes)
+
+            # Scale down the output from Ghostscript
+            w, h = page_image.size
+            return page_image.resize((w * gs_dpi // hr_dpi,
+                                      h * gs_dpi // hr_dpi),
+                                     resample=PIL.Image.BICUBIC)
+
+        else:
+            # Return the image data from Ghostscript directly
+            return image_data
 
     def render_to_pdf(self, output_path):
         """Render the input file to PDF."""
@@ -180,7 +214,57 @@ class GhostscriptBackend(Backend):
                    self.input_path]
 
         # Call Ghostscript to convert the file
-        check_output(gs_args)
+        self._check_output(gs_args)
+
+    # ------------------------------------------------------------------------
+
+    def _check_output(self, args):
+        """Wrapper for check_output() to handle error conditions."""
+
+        try:
+            return check_output(args)
+
+        except (OSError):
+            # The Ghostscript executable could not be found
+            search_names = ", ".join(gs_names)
+            search_dirs = "\n".join(gs_dirs)
+
+            raise BackendError(
+                "Could not render {0}.\n"
+                "Please make sure you have Ghostscript ({1}) "
+                "installed somewhere on your system.\n"
+                "\n"
+                "Searched for Ghostscript in these locations:\n"
+                "{2}"
+                .format(self.input_path, search_names, search_dirs)
+            )
+
+        except (subprocess.CalledProcessError) as err:
+            # Something went wrong with the call to Ghostscript
+            if err.output:
+                # Save the output from Ghostscript
+                gs_output = bytes_to_str(err.output)[:-1]
+
+                # Quote command line arguments containing spaces
+                args = []
+                for arg in err.cmd:
+                    if " " in arg:
+                        args.append('"{0}"'.format(arg))
+                    else:
+                        args.append(arg)
+
+                # Raise a more informative exception
+                raise BackendError(
+                    "{0}\n"
+                    "\n"
+                    "Ghostscript command line (return code = {1}):\n"
+                    "{2}"
+                    .format(gs_output, err.returncode, " ".join(args))
+                )
+
+            else:
+                # Raise the exception as-is
+                raise
 
     # ------------------------------------------------------------------------
 
