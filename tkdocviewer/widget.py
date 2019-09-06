@@ -682,7 +682,7 @@ class DocViewer(tk.Frame, object):
     doc_extensions = list(BACKENDS_BY_EXTENSION.keys())
 
     # Recognized image extensions
-    _builtin_image_extensions = [".png", ".gif", ".jpg", ".jpeg"]
+    _builtin_image_extensions = [".gif", ".jpg", ".jpeg", ".png"]
     image_extensions = _builtin_image_extensions
 
     # Recognized plain-text extensions
