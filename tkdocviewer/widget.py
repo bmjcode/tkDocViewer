@@ -239,8 +239,8 @@ class DocViewer(tk.Frame, object):
     def can_display(self, path):
         """Return whether this widget can display the specified file."""
 
-        return (self._which_rendering_mode(path) is not None
-                or self._force_text_display.get())
+        base, ext = map(str.lower, os.path.splitext(path))
+        return (ext in self.known_extensions or self._force_text_display.get())
 
     def cancel_rendering(self, event=None):
         """Cancel the current rendering process.
@@ -305,21 +305,26 @@ class DocViewer(tk.Frame, object):
         # Blank the canvas
         self.erase()
 
-        # Identify the appropriate rendering mode for this file
-        rendering_mode = self._which_rendering_mode(path)
+        base, ext = map(str.lower, os.path.splitext(path))
 
-        if rendering_mode == "backend":
+        if ext in BACKENDS_BY_EXTENSION.keys():
+            # File format supported by one of our backends
             self._start_rendering_thread(path, pages)
 
-        elif rendering_mode == "image":
+        elif ext in self.image_extensions:
+            # Image format with built-in support
             self._render_image(path)
 
-        elif rendering_mode == "text" or self._force_text_display.get():
+        elif (ext in self.text_extensions
+              or self._force_text_display.get()):
+            # Plain-text format with built-in support
             self._render_text(path)
 
         else:
-            self.display_text("Could not display file: {0}\n"
-                              "Unrecognized file type.".format(path))
+            self.display_text(
+                "Could not find an appropriate backend to render {0}."
+                .format(path)
+            )
 
         # Save the file path and pages
         self._display_path = path
@@ -572,44 +577,6 @@ class DocViewer(tk.Frame, object):
 
     # ------------------------------------------------------------------------
 
-    @staticmethod
-    def _which_rendering_mode(path):
-        """Return the appropriate rendering mode for the specified file.
-
-        This is currently determined based on a simple file extension
-        check. Possible return values are:
-
-          'backend'
-            Use an appropriate backend for the file type.
-            Available backends are listed in BACKENDS_BY_EXTENSION.
-
-          'image'
-            Use the internal image display method.
-
-          'text'
-            Use the internal plain-text display method.
-
-          None
-            Unrecognized file type.
-        """
-
-        # Separate the basename and extension
-        base, ext = os.path.splitext(os.path.basename(path))
-
-        if ext.lower() in BACKENDS_BY_EXTENSION:
-            return "backend"
-
-        elif ext.lower() in DocViewer.image_extensions:
-            return "image"
-
-        elif (ext.lower() in DocViewer.text_extensions
-              or (base.isupper() and not ext)):
-            # All-uppercase with no extension is traditional for README
-            # and other documentation in source archives
-            return "text"
-
-    # ------------------------------------------------------------------------
-
     @property
     def canvas(self):
         """The canvas widget used to display the document."""
@@ -719,6 +686,9 @@ class DocViewer(tk.Frame, object):
 
     # Recognized plain-text extensions
     text_extensions = [".txt"]
+
+    # All known file extensions
+    known_extensions = doc_extensions + image_extensions + text_extensions
 
     # ------------------------------------------------------------------------
 
