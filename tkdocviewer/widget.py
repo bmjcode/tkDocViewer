@@ -36,8 +36,8 @@ try:
 except (ImportError):
     PIL = None
 
-from .backends import GhostscriptBackend, gs_dpi
-from .rendering import GhostscriptThread
+from .backends import BACKENDS_BY_EXTENSION, GhostscriptBackend, gs_dpi
+from .rendering import RenderingThread
 
 
 __all__ = ["DocViewer"]
@@ -239,7 +239,7 @@ class DocViewer(tk.Frame, object):
     def can_display(self, path):
         """Return whether this widget can display the specified file."""
 
-        return (self._which_backend(path) is not None
+        return (self._which_rendering_mode(path) is not None
                 or self._force_text_display.get())
 
     def cancel_rendering(self, event=None):
@@ -305,16 +305,16 @@ class DocViewer(tk.Frame, object):
         # Blank the canvas
         self.erase()
 
-        # Identify the appropriate backend for this file
-        backend = self._which_backend(path)
+        # Identify the appropriate rendering mode for this file
+        rendering_mode = self._which_rendering_mode(path)
 
-        if backend == "gs":
-            self._render_gs(path, pages)
+        if rendering_mode == "backend":
+            self._start_rendering_thread(path, pages)
 
-        elif backend == "image":
+        elif rendering_mode == "image":
             self._render_image(path)
 
-        elif backend == "text" or self._force_text_display.get():
+        elif rendering_mode == "text" or self._force_text_display.get():
             self._render_text(path)
 
         else:
@@ -463,7 +463,7 @@ class DocViewer(tk.Frame, object):
                 self._rendering.set(0)
 
             elif isinstance(item, Exception):
-                # An exception occurred in the Ghostscript thread
+                # An exception occurred in the rendering thread
                 self._rendering.set(0)
 
                 # Display the error message on the canvas
@@ -495,32 +495,6 @@ class DocViewer(tk.Frame, object):
 
             del self._canceler
             self._canceler = None
-
-    def _render_gs(self, path, pages=None):
-        """Render a file using the Ghostscript backend."""
-
-        # Flag that we are currently rendering a page
-        self._rendering.set(1)
-
-        # Create a new queue for rendered pages
-        # This avoids displaying the wrong file if display_file() is called
-        # again before Ghostscript finishes rendering the current file. The
-        # old queue will eventually be garbage-collected and its memory freed.
-        self._queue = queue.Queue()
-
-        # Create a canceler to stop rendering on demand
-        self._canceler = threading.Event()
-
-        # Whether to enable downscaling
-        enable_downscaling = self._enable_downscaling.get()
-
-        # Create a Ghostscript thread to render the file
-        gs = GhostscriptThread(self._queue, self._canceler, path, pages,
-                               enable_downscaling=enable_downscaling)
-        gs.start()
-
-        # Start this in a loop to render each page on the canvas
-        self._process_queue()
 
     def _render_image(self, path):
         """Render an image file."""
@@ -570,17 +544,44 @@ class DocViewer(tk.Frame, object):
             # Windows
             c.yview_scroll(-1 * (event.delta // 120), "units")
 
+    def _start_rendering_thread(self, path, pages=None):
+        """Render a file in a background thread."""
+
+        # Flag that we are currently rendering a page
+        self._rendering.set(1)
+
+        # Create a new queue for rendered pages
+        # This avoids displaying the wrong file if display_file() is called
+        # again before Ghostscript finishes rendering the current file. The
+        # old queue will eventually be garbage-collected and its memory freed.
+        self._queue = queue.Queue()
+
+        # Create a canceler to stop rendering on demand
+        self._canceler = threading.Event()
+
+        # Whether to enable downscaling
+        enable_downscaling = self._enable_downscaling.get()
+
+        # Create a rendering thread to render the file
+        rt = RenderingThread(self._queue, self._canceler, path, pages,
+                             enable_downscaling=enable_downscaling)
+        rt.start()
+
+        # Start this in a loop to render each page on the canvas
+        self._process_queue()
+
     # ------------------------------------------------------------------------
 
     @staticmethod
-    def _which_backend(path):
-        """Return the appropriate backend for the specified file.
+    def _which_rendering_mode(path):
+        """Return the appropriate rendering mode for the specified file.
 
         This is currently determined based on a simple file extension
         check. Possible return values are:
 
-          'gs'
-            Use the Ghostscript backend (backend_gs.py).
+          'backend'
+            Use an appropriate backend for the file type.
+            Available backends are listed in BACKENDS_BY_EXTENSION.
 
           'image'
             Use the internal image display method.
@@ -595,8 +596,8 @@ class DocViewer(tk.Frame, object):
         # Separate the basename and extension
         base, ext = os.path.splitext(os.path.basename(path))
 
-        if ext.lower() in (".pdf", ".ps"):
-            return "gs"
+        if ext.lower() in BACKENDS_BY_EXTENSION:
+            return "backend"
 
         elif ext.lower() in DocViewer.image_extensions:
             return "image"

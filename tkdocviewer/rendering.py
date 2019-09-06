@@ -6,7 +6,7 @@ These are internal APIs and subject to change at any time.
 import os
 import threading
 
-from .backends import GhostscriptBackend
+from .backends import AutoBackend
 
 
 # On Python 2, basestring is the superclass for ASCII and Unicode strings.
@@ -18,13 +18,16 @@ except (NameError): string_type = str
 class RenderingThread(threading.Thread):
     """Thread to run a rendering operation in the background.
 
+    An appropriate backend is automatically selected based on the
+    file extension.
+
     Keyword arguments are forwarded to the backend constructor.
     """
 
-    __slots__ = ["backend", "backend_cls", "kw",
+    __slots__ = ["backend", "kw",
                  "queue", "canceler", "path", "pages"]
 
-    def __init__(self, backend_cls, queue, canceler, path, pages=None, **kw):
+    def __init__(self, queue, canceler, path, pages=None, **kw):
         """Return a new rendering thread."""
 
         threading.Thread.__init__(self)
@@ -32,15 +35,14 @@ class RenderingThread(threading.Thread):
         # Rendering backend; created in run()
         self.backend = None
 
-        # The backend class and keyword arguments
-        self.backend_cls = backend_cls
-        self.kw = kw
-
         # Standard arguments
         self.queue = queue
         self.canceler = canceler
         self.path = path
         self.pages = pages
+
+        # Keyword arguments to forward to the backend constructor
+        self.kw = kw
 
     # ------------------------------------------------------------------------
 
@@ -54,7 +56,7 @@ class RenderingThread(threading.Thread):
 
         try:
             # Create a backend instance to render pages
-            self.backend = self.backend_cls(self.path, **self.kw)
+            self.backend = AutoBackend(self.path, **self.kw)
 
             for page in self._parse_page_list():
                 if self.canceler.is_set():
@@ -146,16 +148,6 @@ class RenderingThread(threading.Thread):
         # Put the exception into the queue and let DocViewer process it
         # in the main thread
         self.queue.put(RenderingThreadError(message))
-
-
-class GhostscriptThread(RenderingThread):
-    """Thread to render a document using Ghostscript."""
-
-    def __init__(self, queue, canceler, path, pages=None, **kw):
-        """Return a new Ghostscript process thread."""
-
-        RenderingThread.__init__(self, GhostscriptBackend,
-                                 queue, canceler, path, pages, **kw)
 
 
 class RenderingThreadError(Exception):
