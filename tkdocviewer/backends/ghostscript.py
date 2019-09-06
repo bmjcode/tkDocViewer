@@ -226,8 +226,8 @@ class GhostscriptBackend(Backend):
             # Return the image data from Ghostscript directly
             return image_data
 
-    def render_to_pdf(self, output_path):
-        """Render the input file to PDF."""
+    def render_to(self, device, output_path):
+        """Render the input file to the specified Ghostscript output device."""
 
         # Sanity checks
         if output_path == self.input_path:
@@ -243,12 +243,17 @@ class GhostscriptBackend(Backend):
                    "-dBATCH",
                    "-dNOPAUSE",
                    "-dSAFER",
-                   "-sDEVICE=pdfwrite",
+                   "-sDEVICE={0}".format(device),
                    "-sOutputFile={0}".format(output_path),
                    self.input_path]
 
         # Call Ghostscript to convert the file
         self._check_output(gs_args)
+
+    def render_to_pdf(self, output_path):
+        """Render the input file to PDF."""
+
+        return self.render_to("pdfwrite", output_path)
 
     # ------------------------------------------------------------------------
 
