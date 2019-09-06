@@ -3,6 +3,7 @@
 This is an internal API and subject to change at any time.
 """
 
+import os
 import sys
 import subprocess
 
@@ -10,12 +11,23 @@ import subprocess
 class Backend(object):
     """Base class for tkDocViewer backends."""
 
-    __slots__ = ["input_path"]
+    __slots__ = ["input_path", "temp_files"]
 
-    def __init__(self, input_path):
+    def __init__(self, input_path, **kw):
         """Return a new rendering backend."""
 
         self.input_path = input_path
+
+        # Temporary files created by this backend
+        self.temp_files = []
+
+    def __del__(self):
+        """Clean up before this backend is destroyed."""
+
+        # Clean up temporary files
+        for path in self.temp_files:
+            os.remove(path)
+            self.temp_files.remove(path)
 
     def page_count(self):
         """Return the number of pages in the input file.
@@ -25,12 +37,10 @@ class Backend(object):
 
         raise NotImplementedError
 
-    def render_page(self, page_num, **kw):
+    def render_page(self, page_num):
         """Render the specified page of the input file.
 
         This should return image data that the UI code can process.
-        Supported keyword arguments are defined by each backend.
-
         Override this in your subclass.
         """
 

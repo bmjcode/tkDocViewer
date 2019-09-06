@@ -8,6 +8,9 @@ import sys
 import subprocess
 import io
 
+# Used for conversion of Postscript to PDF
+import tempfile
+
 # Downscaling support requires PIL
 try:
     import PIL
@@ -91,16 +94,61 @@ __all__ = ["GhostscriptBackend", "GhostscriptNotAvailable", "gs_dpi"]
 
 
 class GhostscriptBackend(Backend):
-    """Backend to render a document using Ghostscript."""
+    """Backend to render a document using Ghostscript.
 
-    __slots__ = []
+    This backend supports the following formats:
+    PDF -- rendered directly.
+    Postscript -- must be converted to PDF first because rendering
+      individual pages from Postscript files is not supported. This
+      happens automatically when input_file has a .ps extension.
+
+    Internal format conversion creates temporary files, which are
+    cleaned up when the backend object is destroyed.
+
+    Supported keyword arguments:
+    enable_downscaling -- whether to enable downscaling using PIL.
+    """
+
+    __slots__ = ["enable_downscaling"]
+
+    def __init__(self, input_path, **kw):
+        """Return a new Ghostscript rendering backend."""
+
+        Backend.__init__(self, input_path, **kw)
+
+        # Whether to enable downscaling
+        # This has no effect if PIL is not available on your system.
+        if "enable_downscaling" in kw:
+            self.enable_downscaling = kw["enable_downscaling"]
+        else:
+            self.enable_downscaling = False
+
+        # Determine whether we can render this file based on its extension
+        base, ext = os.path.splitext(input_path)
+
+        if ext.lower() == ".pdf":
+            # Render PDF files directly
+            self.input_path = input_path
+
+        elif ext.lower() == ".ps":
+            # Convert Postscript files to PDF
+            fd, pdf_path = tempfile.mkstemp(suffix=".pdf")
+            os.close(fd)
+            self.render_to_pdf(pdf_path)
+
+            # Render the converted PDF file
+            self.input_path = pdf_path
+            self.temp_files.append(pdf_path)
+
+        else:
+            raise BackendError(
+                "Could not render {0} because the file type is not "
+                "supported by the Ghostscript backend."
+                .format(input_path)
+            )
 
     def page_count(self):
-        """Return the number of pages in the input file.
-
-        This function only directly supports PDF files; other file
-        types supported by Ghostscript must be converted first.
-        """
+        """Return the number of pages in the input file."""
 
         base, ext = os.path.splitext(self.input_path)
         if ext.lower() != ".pdf":
@@ -122,29 +170,15 @@ class GhostscriptBackend(Backend):
         # Return the page count if it's a valid PDF, or None otherwise
         return int(self._check_output(gs_args))
 
-    def render_page(self, page_num, **kw):
-        """Render the specified page of the input file.
-
-        This function only directly supports PDF files; other file
-        types supported by Ghostscript must be converted first.
-
-        Supported keyword arguments:
-        enable_downscaling -- whether to enable downscaling using PIL.
-        """
+    def render_page(self, page_num):
+        """Render the specified page of the input file."""
 
         base, ext = os.path.splitext(self.input_path)
         if ext.lower() != ".pdf":
             raise BackendError("Only PDF files are supported.")
 
-        # Whether to enable downscaling
-        # This has no effect if PIL is not available on your system.
-        if "enable_downscaling" in kw:
-            enable_downscaling = kw["enable_downscaling"]
-        else:
-            enable_downscaling = False
-
         # Resolution for Ghostscript rendering
-        if PIL and enable_downscaling:
+        if PIL and self.enable_downscaling:
             gs_res = hr_dpi
         else:
             gs_res = gs_dpi
@@ -178,7 +212,7 @@ class GhostscriptBackend(Backend):
         # Call Ghostscript to render the PDF
         image_data = self._check_output(gs_args)
 
-        if PIL and enable_downscaling:
+        if PIL and self.enable_downscaling:
             page_bytes = io.BytesIO(image_data)
             page_image = PIL.Image.open(page_bytes)
 

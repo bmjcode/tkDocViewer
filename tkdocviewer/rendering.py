@@ -6,9 +6,6 @@ These are internal APIs and subject to change at any time.
 import os
 import threading
 
-# Used for conversion of Postscript to PDF
-import tempfile
-
 from .backends import GhostscriptBackend
 
 
@@ -19,44 +16,33 @@ except (NameError): string_type = str
 
 
 class RenderingThread(threading.Thread):
-    """Thread to run a rendering operation in the background."""
+    """Thread to run a rendering operation in the background.
 
-    __slots__ = ["backend", "backend_cls",
-                 "queue", "canceler", "path", "pages",
-                 "render_kw", "temp_files"]
+    Keyword arguments are forwarded to the backend constructor.
+    """
+
+    __slots__ = ["backend", "backend_cls", "kw",
+                 "queue", "canceler", "path", "pages"]
 
     def __init__(self, backend_cls, queue, canceler, path, pages=None, **kw):
         """Return a new rendering thread."""
 
         threading.Thread.__init__(self)
 
-        # Rendering backend; created by self.create_backend()
+        # Rendering backend; created in run()
         self.backend = None
 
-        # Standard arguments
+        # The backend class and keyword arguments
         self.backend_cls = backend_cls
+        self.kw = kw
+
+        # Standard arguments
         self.queue = queue
         self.canceler = canceler
         self.path = path
         self.pages = pages
 
-        # Optional keyword arguments for self.backend.render_page()
-        self.render_kw = {}
-
-        # Temporary files to clean up after rendering; not used by the
-        # standard RenderingThread, but may be necessary for subclasses
-        self.temp_files = []
-
     # ------------------------------------------------------------------------
-
-    def create_backend(self):
-        """Create a backend for rendering the input file.
-
-        Your subclass can override this if you need to do special
-        pre-processing, such as converting to a different file type.
-        """
-
-        self.backend = self.backend_cls(self.path)
 
     def run(self):
         """Render the file."""
@@ -68,7 +54,7 @@ class RenderingThread(threading.Thread):
 
         try:
             # Create a backend instance to render pages
-            self.create_backend()
+            self.backend = self.backend_cls(self.path, **self.kw)
 
             for page in self._parse_page_list():
                 if self.canceler.is_set():
@@ -76,7 +62,7 @@ class RenderingThread(threading.Thread):
                     break
 
                 # Render the page
-                image_data = self.backend.render_page(page, **self.render_kw)
+                image_data = self.backend.render_page(page)
 
                 # Pass the image data to the DocViewer widget
                 self.queue.put(image_data)
@@ -87,11 +73,6 @@ class RenderingThread(threading.Thread):
         except (Exception) as err:
             # Forward the error message to the UI thread
             self._push_error(err)
-
-        finally:
-            # Clean up temporary files
-            for path in self.temp_files:
-                os.remove(path)
 
     # ------------------------------------------------------------------------
 
@@ -174,42 +155,7 @@ class GhostscriptThread(RenderingThread):
         """Return a new Ghostscript process thread."""
 
         RenderingThread.__init__(self, GhostscriptBackend,
-                                 queue, canceler, path, pages)
-
-        # Whether to enable downscaling
-        if "enable_downscaling" in kw:
-            self.render_kw["enable_downscaling"] = kw["enable_downscaling"]
-
-    # ------------------------------------------------------------------------
-
-    def create_backend(self):
-        """Create a backend for rendering the input file."""
-
-        base, ext = os.path.splitext(self.path)
-
-        if ext.lower() == ".pdf":
-            # Render PDF files directly
-            self.backend = self.backend_cls(self.path)
-
-        elif ext.lower() == ".ps":
-            # We can't render individual pages from Postscript files,
-            # so convert them to PDF first
-            fd, pdf_path = tempfile.mkstemp(suffix=".pdf")
-            os.close(fd)
-
-            pdf_backend = GhostscriptBackend(self.path)
-            pdf_backend.render_to_pdf(pdf_path)
-
-            # Render the converted PDF file
-            self.backend = self.backend_cls(pdf_path)
-
-            # Clean up the temporary file after exiting
-            self.temp_files.append(pdf_path)
-
-        else:
-            # This should never happen
-            raise RenderingThreadError("Could not render {0}: unrecognized "
-                                       "file extension.".format(self.path))
+                                 queue, canceler, path, pages, **kw)
 
 
 class RenderingThreadError(Exception):
