@@ -39,21 +39,21 @@ For detailed documentation, try `python3 -m pydoc tkdocviewer`.
 **Note**: Most file formats require third-party modules or external applications. tkDocViewer will still run without them, but file format support will be limited by what's available on your system.
 
 ### Document Formats
-Format | Extensions | Backend | Requirements | Notes
------- | ---------- | ------- | ------------ | -----
-PDF | `.pdf` | `GhostscriptBackend` | [Ghostscript](https://ghostscript.com/) |
-Plain text | `.txt` | built-in | none |
-Postscript | `.ps` | `GhostscriptBackend` | Ghostscript |
+Format | Extensions | Requirements | Notes
+------ | ---------- | ------------ | -----
+PDF | `.pdf` | [Ghostscript](https://ghostscript.com/) |
+Plain text | `.txt` | none |
+Postscript | `.ps` | Ghostscript |
 
 ### Image Formats
-Format | Extensions | Backend | Requirements | Notes
------- | ---------- | ------- | ------------ | -----
-Bitmap image | `.bmp`, `.pcx` | built-in | [Pillow](https://python-pillow.org/)  |
-GIF | `.gif` | `PILMultiframeBackend` | Pillow | Animations are displayed as individual frames.
-JPEG | `.jpg`, `.jpeg` | built-in | Pillow |
-PNG | `.png` | built-in | Pillow |
-Netpbm | `.pbm`, `.pgm`, `.pnm`, `.ppm` | built-in | Pillow |
-Targa | `.tga` | built-in | Pillow |
-TIFF | `.tif`, `.tiff` | `PILMultiframeBackend` | Pillow | Supports multi-page documents.
-Windows icon | `.ico` | built-in | Pillow |
-X bitmap | `.xbm` | built-in | Pillow
+Format | Extensions | Requirements | Notes
+------ | ---------- | ------------ | -----
+Bitmap image | `.bmp`, `.pcx` | [Pillow](https://python-pillow.org/) |
+GIF | `.gif` | Pillow | Animations are displayed as individual frames.
+JPEG | `.jpg`, `.jpeg` | Pillow |
+PNG | `.png` | Pillow |
+Netpbm | `.pbm`, `.pgm`, `.pnm`, `.ppm` | Pillow |
+Targa | `.tga` | Pillow |
+TIFF | `.tif`, `.tiff` | Pillow | Supports multi-page documents.
+Windows icon | `.ico` | Pillow |
+X bitmap | `.xbm` | Pillow |
