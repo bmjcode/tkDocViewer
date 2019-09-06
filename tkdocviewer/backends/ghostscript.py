@@ -107,6 +107,14 @@ class GhostscriptBackend(Backend):
 
     Supported keyword arguments:
     enable_downscaling -- whether to enable downscaling using PIL.
+
+    This backend requires an external Ghostscript binary. Most Unix
+    systems should already have this installed as 'gs'. Windows users
+    can download a suitable installer from the Ghostscript website.
+
+    To enable downscaling, this backend also requires the PIL module.
+    If downscaling is enabled and the PIL module is not available, the
+    enable_downscaling argument will be silently ignored.
     """
 
     __slots__ = ["enable_downscaling"]

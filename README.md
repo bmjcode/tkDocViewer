@@ -1,14 +1,6 @@
-**tkDocViewer** is a document viewer widget for Python + Tkinter. It is primarily intended for displaying file previews.
+**tkDocViewer** is an inefficient, yet practical, Tkinter widget for displaying file previews.
 
-Currently supported file types include:
-
-* Plain text
-* PDF, Postscript (requires an external Ghostscript binary)
-* PNG, GIF, JPEG (requires PIL)
-
-tkDocViewer is designed to be simple above all else. All dependencies outside the Python standard library are optional (though file type support will be limited). Its API is designed to let you accomplish tasks with as few method calls as possible.
-
-This emphasis on simplicity does come with some performance costs. It is not necessarily the fastest nor the most resource-efficient viewer, but it should generally run well enough to get the job done.
+It supports a variety of document and image formats; see below for the complete list. Support for new formats can be added through a modular backend system.
 
 Both Python 2 and 3 are supported, on Windows and Unix platforms.
 
@@ -39,14 +31,29 @@ v.display_file("example.pdf")
 root.mainloop()
 ```
 
-For detailed documentation, try `python -m pydoc tkdocviewer`.
+For detailed documentation, try `python3 -m pydoc tkdocviewer`.
 
 
-## Dependencies
+## Supported Formats
 
-Most file formats require third-party modules or external applications. tkDocViewer will still run without them, but file format support will be limited by what's available on your system.
+**Note**: Most file formats require third-party modules or external applications. tkDocViewer will still run without them, but file format support will be limited by what's available on your system.
 
-Name | Type | Notes
----- | ---- | -----
-[Ghostscript](https://ghostscript.com/) | External application | Required for PDF and Postscript support.
-[Pillow](https://python-pillow.org/) | Python module | Required for most image formats; optional for PDF support.
+### Document Formats
+Format | Extensions | Backend | Requirements | Notes
+------ | ---------- | ------- | ------------ | -----
+PDF | `.pdf` | `GhostscriptBackend` | [Ghostscript](https://ghostscript.com/) |
+Plain text | `.txt` | built-in | none |
+Postscript | `.ps` | `GhostscriptBackend` | Ghostscript |
+
+### Image Formats
+Format | Extensions | Backend | Requirements | Notes
+------ | ---------- | ------- | ------------ | -----
+Bitmap image | `.bmp`, `.pcx` | built-in | [Pillow](https://python-pillow.org/)  |
+GIF | `.gif` | `PILMultiframeBackend` | Pillow | Animations are displayed as individual frames.
+JPEG | `.jpg`, `.jpeg` | built-in | Pillow |
+PNG | `.png` | built-in | Pillow |
+Netpbm | `.pbm`, `.pgm`, `.pnm`, `.ppm` | built-in | Pillow |
+Targa | `.tga` | built-in | Pillow |
+TIFF | `.tif`, `.tiff` | `PILMultiframeBackend` | Pillow | Supports multi-page documents.
+Windows icon | `.ico` | built-in | Pillow |
+X bitmap | `.xbm` | built-in | Pillow
