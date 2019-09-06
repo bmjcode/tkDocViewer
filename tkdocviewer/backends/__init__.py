@@ -1,7 +1,27 @@
 """Backends for rendering various file types.
 
-A backend processes an input file and returns image data that the
-user interface code can display.
+Backends are used to render complex file formats that require
+special processing to display. They normally run in a background
+thread that communicates with the UI thread via a queue.
+
+The base class for backends is backends.shared.Backend.
+
+All backend constructors require the path to an input file as
+their first positional argument. Backend constructors may optionally
+accept additional keyword arguments; keywords not recognized by a
+particular backend are silently ignored.
+
+A minimal backend implements two functions:
+
+  page_count()
+    Return the number of pages in the input file.
+
+  render_page(page_num)
+    Render the specified page of the input file.
+    Supported return types are:
+      PIL Image object
+      Tkinter PhotoImage object
+      Raw image data understood by PhotoImage
 
 These are internal APIs and subject to change at any time.
 """
@@ -15,6 +35,13 @@ from .shared import Backend, BackendError
 from .ghostscript import GhostscriptBackend, gs_dpi
 from .pil_multiframe import PILMultiframeBackend
 
+
+# To register a new backend:
+#  1. Import its class.
+#  2. Add its class name to __all__.
+#  3. Add entries to BACKENDS_BY_EXTENSION for each supported file extension.
+#     Use the extension as the key, and your class as the value.
+#  4. Add each supported extension to the appropriate BACKEND_*_EXTENSIONS.
 
 __all__ = [
     "BACKENDS_BY_EXTENSION",

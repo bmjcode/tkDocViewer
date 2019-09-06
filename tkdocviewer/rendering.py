@@ -1,5 +1,10 @@
 """Support for rendering in a background thread.
 
+This module implements the RenderingThread class, which is used
+to run a rendering backend in a separate thread. This allows slow
+operations, like rendering PDF files with Ghostscript, to run in
+the background without locking up the user interface.
+
 These are internal APIs and subject to change at any time.
 """
 
@@ -21,7 +26,18 @@ class RenderingThread(threading.Thread):
     An appropriate backend is automatically selected based on the
     file extension.
 
+    Positional arguments:
+    queue -- a queue.Queue object used to pass rendered data back
+      to the user interface thread.
+    canceler -- a threading.Event that, if set, causes further
+      processing to be aborted.
+    path -- the path to the input file.
+    pages -- a list of pages (or image frames, etc.) to render.
+
     Keyword arguments are forwarded to the backend constructor.
+
+    Exceptions raised in a RenderingThread are passed to the user
+    interface and displayed as text strings.
     """
 
     __slots__ = ["backend", "kw",
@@ -32,7 +48,7 @@ class RenderingThread(threading.Thread):
 
         threading.Thread.__init__(self)
 
-        # Rendering backend; created in run()
+        # Rendering backend; created in run() for performance reasons
         self.backend = None
 
         # Standard arguments
