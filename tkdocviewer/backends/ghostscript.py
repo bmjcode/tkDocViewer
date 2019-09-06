@@ -226,8 +226,11 @@ class GhostscriptBackend(Backend):
             # Return the image data from Ghostscript directly
             return image_data
 
-    def render_to(self, device, output_path):
-        """Render the input file to the specified Ghostscript output device."""
+    def render_to(self, device, output_path, *args):
+        """Render the input file to the specified Ghostscript output device.
+
+        Positional arguments are appended to the Ghostscript command line.
+        """
 
         # Sanity checks
         if output_path == self.input_path:
@@ -244,8 +247,10 @@ class GhostscriptBackend(Backend):
                    "-dNOPAUSE",
                    "-dSAFER",
                    "-sDEVICE={0}".format(device),
-                   "-sOutputFile={0}".format(output_path),
-                   self.input_path]
+                   "-sOutputFile={0}".format(output_path)]
+        if args:
+            gs_args += list(args)
+        gs_args.append(self.input_path)
 
         # Call Ghostscript to convert the file
         self._check_output(gs_args)
