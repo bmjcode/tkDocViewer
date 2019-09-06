@@ -505,7 +505,16 @@ class DocViewer(tk.Frame, object):
             self._canceler = None
 
     def _render_image(self, path):
-        """Render an image file."""
+        """Render an image file using PIL.
+
+        This is implemented here for performance reasons; it's much
+        more efficient to process single-frame images in the main
+        thread than to use a backend in a separate rendering thread.
+
+        This function only displays the first frame of multi-frame
+        images such as GIF and TIFF. To display all the frames, start
+        a rendering thread using PILMultiframeBackend.
+        """
 
         if PIL:
             try:

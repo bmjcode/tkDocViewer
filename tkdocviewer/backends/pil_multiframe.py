@@ -1,5 +1,11 @@
 """Backend for rendering multi-frame images using PIL.
 
+This backend is used to render image formats supporting multiple
+frames in a single file, such as GIF and TIFF.
+
+Note: For performance reasons, support for rendering single-frame
+images using PIL is built into the DocViewer widget.
+
 These are internal APIs and subject to change at any time.
 """
 
