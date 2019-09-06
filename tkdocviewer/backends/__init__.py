@@ -45,10 +45,13 @@ from .pil_multiframe import PILMultiframeBackend
 
 __all__ = [
     "BACKENDS_BY_EXTENSION",
+    "BACKEND_DOC_EXTENSIONS",
+    "BACKEND_IMAGE_EXTENSIONS",
     "AutoBackend",
     "Backend",
     "BackendError",
     "GhostscriptBackend",
+    "PILMultiframeBackend",
     "gs_dpi"
 ]
 
