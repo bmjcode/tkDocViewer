@@ -36,7 +36,10 @@ try:
 except (ImportError):
     PIL = None
 
-from .backends import BACKENDS_BY_EXTENSION, GhostscriptBackend, gs_dpi
+from .backends import (BACKEND_DOC_EXTENSIONS,
+                       BACKEND_IMAGE_EXTENSIONS,
+                       BACKENDS_BY_EXTENSION,
+                       GhostscriptBackend, gs_dpi)
 from .rendering import RenderingThread
 
 
@@ -679,13 +682,15 @@ class DocViewer(tk.Frame, object):
     # FIXME: These should probably be defined in backends/__init__.py.
 
     # Recognized document extensions
-    doc_extensions = list(BACKENDS_BY_EXTENSION.keys())
+    doc_extensions = BACKEND_DOC_EXTENSIONS
 
     # Recognized image extensions
-    _builtin_image_extensions = [".bmp", ".gif", ".ico", ".jpg", ".jpeg",
+    # Note: GIF and TIFF support is handled by PILMultiframeBackend.
+    _builtin_image_extensions = [".bmp", ".ico", ".jpg", ".jpeg",
                                  ".pbm", ".pcx", ".pgm", ".png", ".pnm",
                                  ".ppm", ".tga", ".xbm"]
-    image_extensions = _builtin_image_extensions
+    image_extensions = sorted(_builtin_image_extensions
+                              + BACKEND_IMAGE_EXTENSIONS)
 
     # Recognized plain-text extensions
     _builtin_text_extensions = [".txt"]
