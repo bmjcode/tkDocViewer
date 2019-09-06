@@ -311,11 +311,11 @@ class DocViewer(tk.Frame, object):
             # File format supported by one of our backends
             self._start_rendering_thread(path, pages)
 
-        elif ext in self.image_extensions:
+        elif ext in self._builtin_image_extensions:
             # Image format with built-in support
             self._render_image(path)
 
-        elif (ext in self.text_extensions
+        elif (ext in self._builtin_text_extensions
               or self._force_text_display.get()):
             # Plain-text format with built-in support
             self._render_text(path)
@@ -682,10 +682,12 @@ class DocViewer(tk.Frame, object):
     doc_extensions = list(BACKENDS_BY_EXTENSION.keys())
 
     # Recognized image extensions
-    image_extensions = [".png", ".gif", ".jpg", ".jpeg"]
+    _builtin_image_extensions = [".png", ".gif", ".jpg", ".jpeg"]
+    image_extensions = _builtin_image_extensions
 
     # Recognized plain-text extensions
-    text_extensions = [".txt"]
+    _builtin_text_extensions = [".txt"]
+    text_extensions = _builtin_text_extensions
 
     # All known file extensions
     known_extensions = doc_extensions + image_extensions + text_extensions
