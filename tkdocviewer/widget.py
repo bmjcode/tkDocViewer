@@ -708,6 +708,11 @@ class DocViewer(tk.Frame, object):
 
     # These values are technically user-customizable, but this is considered
     # an undocumented feature, and may be removed from a future release.
+    #
+    # FIXME: These should probably be defined in backends/__init__.py.
+
+    # Recognized document extensions
+    doc_extensions = list(BACKENDS_BY_EXTENSION.keys())
 
     # Recognized image extensions
     image_extensions = [".png", ".gif", ".jpg", ".jpeg"]
