@@ -702,6 +702,6 @@ class DocViewer(tk.Frame, object):
     # ------------------------------------------------------------------------
 
     # Useful Ghostscript-related debugging information
-    gs_executable = staticmethod(GhostscriptBackend.gs_executable)
-    gs_search_path = staticmethod(GhostscriptBackend.gs_search_path)
-    gs_version = staticmethod(GhostscriptBackend.gs_version)
+    gs_executable = staticmethod(GhostscriptBackend.executable)
+    gs_search_path = staticmethod(GhostscriptBackend.search_path)
+    gs_version = staticmethod(GhostscriptBackend.version)

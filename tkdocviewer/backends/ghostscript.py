@@ -308,19 +308,19 @@ class GhostscriptBackend(Backend):
     # ------------------------------------------------------------------------
 
     @staticmethod
-    def gs_executable():
+    def executable():
         """Return the path to the Ghostscript executable."""
 
         return gs_exe
 
     @staticmethod
-    def gs_search_path():
+    def search_path():
         """Return the search path for the Ghostscript executable."""
 
         return gs_dirs
 
     @staticmethod
-    def gs_version():
+    def version():
         """Return the version of the Ghostscript executable."""
 
         try:
