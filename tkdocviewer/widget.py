@@ -525,10 +525,11 @@ class DocViewer(tk.Frame, object):
                 self.display_text(err)
 
         else:
-            # Suggest the user should install PIL to enable this feature
-            self.display_text("Could not render this image file.\n"
-                              "Please make sure the PIL module is available "
-                              "on your system.")
+            self.display_text(
+                "Could not render {0} because PIL is not available "
+                "on your system."
+                .format(path)
+            )
 
     def _render_text(self, path):
         """Render a plain-text file."""
