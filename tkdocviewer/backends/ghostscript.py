@@ -41,7 +41,18 @@ if sys.platform.startswith("win"):
     # (This is a list, not a set, to ensure we preserve our search order)
     gs_dirs = []
 
-    # 1. A dedicated Ghostscript installation
+    # 1. Your application directory
+    #    This lets your application distribute its own Ghostscript binary,
+    #    which may be preferable to ensure you have a known good version.
+    app_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    for dirpath, dirnames, filenames in os.walk(app_dir):
+        for dirname in dirnames:
+            gs_dir = os.path.join(dirpath, dirname)
+            if glob(os.path.join(gs_dir, "gswin??c.exe")):
+                # Directory appears to contain a Ghostscript executable
+                gs_dirs.append(gs_dir)
+
+    # 2. A dedicated Ghostscript installation
     #    EXEs are usually under something like %PROGRAMFILES%\gs\gs9.27\bin.
     for program_files in map(os.getenv, pf_vars):
         if program_files:
@@ -54,16 +65,6 @@ if sys.platform.startswith("win"):
                     # already include this directory in our search path
                     if dirname.lower() == "bin" and not gs_dir in gs_dirs:
                         gs_dirs.append(gs_dir)
-
-    # 2. Your application directory
-    #    This lets your application distribute its own Ghostscript binary.
-    app_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-    for dirpath, dirnames, filenames in os.walk(app_dir):
-        for dirname in dirnames:
-            gs_dir = os.path.join(dirpath, dirname)
-            if glob(os.path.join(gs_dir, "gswin??c.exe")):
-                # Directory appears to contain a Ghostscript executable
-                gs_dirs.append(gs_dir)
 
     ## 3. Other locations in %PATH%
     ##    Deliberately omitted because this is potentially dangerous,
