@@ -18,12 +18,13 @@ except (ImportError):
     PIL = None
 
 from .shared import Backend, BackendError, bytes_to_str, check_output
+from .util import find_executable
 
 # ------------------------------------------------------------------------
 
 # Path to the Ghostscript executable
 if sys.platform.startswith("win"):
-    found_ghostscript = False
+    from glob import glob
 
     # Possible names for the Ghostscript executable and Program Files
     # Only the console version of Ghostscript (gswin??c.exe) will work
@@ -41,44 +42,55 @@ if sys.platform.startswith("win"):
     gs_dirs = []
 
     # 1. A dedicated Ghostscript installation
-    #    This likely has the most features and highest-quality rendering.
+    #    EXEs are usually under something like %PROGRAMFILES%\gs\gs9.27\bin.
     for program_files in map(os.getenv, pf_vars):
         if program_files:
             gs_dir = os.path.join(program_files, "gs")
-            if os.path.isdir(gs_dir) and not gs_dir in gs_dirs:
+            for dirpath, dirnames, filenames in os.walk(gs_dir):
+                for dirname in dirnames:
+                    gs_dir = os.path.join(dirpath, dirname)
+                    # Because some of the variables in pf_vars may refer
+                    # to the same location, we have to check that we didn't
+                    # already include this directory in our search path
+                    if dirname.lower() == "bin" and not gs_dir in gs_dirs:
+                        gs_dirs.append(gs_dir)
+
+    # 2. Your application directory
+    #    This lets your application distribute its own Ghostscript binary.
+    app_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    for dirpath, dirnames, filenames in os.walk(app_dir):
+        for dirname in dirnames:
+            gs_dir = os.path.join(dirpath, dirname)
+            if glob(os.path.join(gs_dir, "gswin??c.exe")):
+                # Directory appears to contain a Ghostscript executable
                 gs_dirs.append(gs_dir)
 
-    # 2. The directory containing the running executable
-    #    This lets your application distribute its own Ghostscript binary
-    #    as a fallback in case it's not installed elsewhere on the system.
-    gs_dirs.append(os.path.dirname(os.path.realpath(sys.argv[0])))
+    ## 3. Other locations in %PATH%
+    ##    Deliberately omitted because this is potentially dangerous,
+    ##    and we can't be sure that whatever we find will be any good.
+    #gs_dirs += os.getenv("PATH").split(os.pathsep)
 
-    # That's enough search paths -- now start looking
-    for gs_dir in gs_dirs:
-        for dirpath, dirname, filenames in os.walk(gs_dir):
-            for gs_name in gs_names:
-                if gs_name in map(str.lower, filenames):
-                    # We've found a match
-                    gs_exe = os.path.join(dirpath, gs_name)
-
-                    found_ghostscript = True
-                    break
-
-            if found_ghostscript:
-                break
-
-        if found_ghostscript:
-            break
-
-    if not found_ghostscript:
-        # Maybe it's somewhere in $PATH -- unlikely, but what else can you do?
-        gs_exe = gs_names[-1]
+    # Now look for a Ghostscript executable
+    gs_exe = find_executable(gs_names, gs_dirs)
 
 else:
-    # On other platforms, assume Ghostscript is somewhere in $PATH
-    gs_exe = "gs"
-    gs_names = gs_exe,
+    # Assume anything else is some kind of Unix system
+    # Most Unix systems have Ghostscript available somewhere in $PATH
+    gs_names = "gs",
     gs_dirs = os.getenv("PATH").split(os.pathsep)
+    gs_exe = find_executable(gs_names, gs_dirs)
+
+gs_version = None
+if gs_exe:
+    # Retrieve the Ghostscript version number
+    # This doubles as a test that our Ghostscript executable is usable.
+    # The [:-1] is to remove the trailing newline from Ghostscript's output.
+    try:
+        gs_version = bytes_to_str(check_output([gs_exe, "--version"])[:-1])
+
+    except (OSError):
+        # There's something wrong with our Ghostscript executable!
+        gs_exe = None
 
 # ------------------------------------------------------------------------
 
@@ -123,6 +135,24 @@ class GhostscriptBackend(Backend):
         """Return a new Ghostscript rendering backend."""
 
         Backend.__init__(self, input_path, **kw)
+
+        # Make sure we have a Ghostscript binary available
+        if not gs_exe:
+            # Identify possible executable names and search dirs
+            search_names = ", ".join(gs_names)
+            search_dirs = "\n".join(gs_dirs)
+            if not search_dirs:
+                search_dirs = "<no Ghostscript installations found>"
+
+            raise BackendError(
+                "Could not render {0}.\n"
+                "Please make sure you have Ghostscript ({1}) "
+                "installed somewhere on your system.\n"
+                "\n"
+                "Searched for Ghostscript in these locations:\n"
+                "{2}"
+                .format(self.input_path, search_names, search_dirs)
+            )
 
         # Whether to enable downscaling
         # This has no effect if PIL is not available on your system.
@@ -276,21 +306,6 @@ class GhostscriptBackend(Backend):
         try:
             return check_output(args)
 
-        except (OSError):
-            # The Ghostscript executable could not be found
-            search_names = ", ".join(gs_names)
-            search_dirs = "\n".join(gs_dirs)
-
-            raise BackendError(
-                "Could not render {0}.\n"
-                "Please make sure you have Ghostscript ({1}) "
-                "installed somewhere on your system.\n"
-                "\n"
-                "Searched for Ghostscript in these locations:\n"
-                "{2}"
-                .format(self.input_path, search_names, search_dirs)
-            )
-
         except (subprocess.CalledProcessError) as err:
             # Something went wrong with the call to Ghostscript
             if err.output:
@@ -336,11 +351,4 @@ class GhostscriptBackend(Backend):
     def version():
         """Return the version of the Ghostscript executable."""
 
-        try:
-            # Return the version number, minus the trailing newline
-            gs_ver = check_output([gs_exe, "--version"])[:-1]
-            return bytes_to_str(gs_ver)
-
-        except (OSError):
-            # No Ghostscript executable was found
-            return None
+        return gs_version
