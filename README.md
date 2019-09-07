@@ -44,6 +44,7 @@ Format | Extensions | Requirements | Notes
 PDF | `.pdf` | [Ghostscript](https://ghostscript.com/) |
 Plain text | `.txt` | none |
 Postscript | `.ps` | Ghostscript |
+XPS | `.xps` | Ghostscript, [GhostXPS](https://www.ghostscript.com/download/gxpsdnld.html) | OpenXPS has not been tested.
 
 ### Image Formats
 Format | Extensions | Requirements | Notes

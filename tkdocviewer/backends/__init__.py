@@ -33,6 +33,7 @@ from .shared import Backend, BackendError
 
 # Individual backends, in alphabetical order
 from .ghostscript import GhostscriptBackend, gs_dpi
+from .ghostxps import GhostXPSBackend
 from .pil_multiframe import PILMultiframeBackend
 
 
@@ -51,6 +52,7 @@ __all__ = [
     "Backend",
     "BackendError",
     "GhostscriptBackend",
+    "GhostXPSBackend",
     "PILMultiframeBackend",
     "gs_dpi"
 ]
@@ -62,10 +64,11 @@ BACKENDS_BY_EXTENSION = {
     ".ps": GhostscriptBackend,
     ".tif": PILMultiframeBackend,
     ".tiff": PILMultiframeBackend,
+    ".xps": GhostXPSBackend,
 }
 
 # Document extensions supported by our backends
-BACKEND_DOC_EXTENSIONS = [".pdf", ".ps"]
+BACKEND_DOC_EXTENSIONS = [".pdf", ".ps", ".xps"]
 
 # Image extensions supported by our backends
 BACKEND_IMAGE_EXTENSIONS = [".gif", ".tif", ".tiff"]
