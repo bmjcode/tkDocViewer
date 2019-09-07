@@ -147,10 +147,9 @@ class GhostscriptBackend(Backend):
 
             raise BackendError(
                 "Could not render {0}.\n"
-                "Please make sure you have Ghostscript ({1}) "
-                "installed somewhere on your system.\n"
+                "Please make sure you have Ghostscript installed.\n"
                 "\n"
-                "Searched for Ghostscript in these locations:\n"
+                "Searched for {1} in these locations:\n"
                 "{2}"
                 .format(self.input_path, search_names, search_dirs)
             )
