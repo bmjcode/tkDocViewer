@@ -51,7 +51,7 @@ Format | Extensions | Requirements | Notes
 ------ | ---------- | ------------ | -----
 Bitmap image | `.bmp`, `.pcx` | [Pillow](https://python-pillow.org/) |
 GIF | `.gif` | Pillow | Animations are displayed as individual frames.
-JPEG | `.jpg`, `.jpeg` | Pillow |
+JPEG | `.jpe`, `.jpg`, `.jpeg` | Pillow |
 PNG | `.png` | Pillow |
 Netpbm | `.pbm`, `.pgm`, `.pnm`, `.ppm` | Pillow |
 Targa | `.tga` | Pillow |

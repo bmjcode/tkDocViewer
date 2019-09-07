@@ -696,7 +696,7 @@ class DocViewer(tk.Frame, object):
 
     # Recognized image extensions
     # Note: GIF and TIFF support is handled by PILMultiframeBackend.
-    _builtin_image_extensions = [".bmp", ".ico", ".jpg", ".jpeg",
+    _builtin_image_extensions = [".bmp", ".ico", ".jpe", ".jpg", ".jpeg",
                                  ".pbm", ".pcx", ".pgm", ".png", ".pnm",
                                  ".ppm", ".tga", ".xbm"]
     image_extensions = sorted(_builtin_image_extensions
