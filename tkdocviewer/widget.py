@@ -688,8 +688,6 @@ class DocViewer(tk.Frame, object):
 
     # These values are technically user-customizable, but this is considered
     # an undocumented feature, and may be removed from a future release.
-    #
-    # FIXME: These should probably be defined in backends/__init__.py.
 
     # Recognized document extensions
     doc_extensions = BACKEND_DOC_EXTENSIONS
