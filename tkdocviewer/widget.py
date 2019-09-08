@@ -308,6 +308,7 @@ class DocViewer(tk.Frame, object):
         # Blank the canvas
         self.erase()
 
+        # Determine how to render the file based on its extension
         base, ext = map(str.lower, os.path.splitext(path))
 
         if ext in BACKENDS_BY_EXTENSION.keys():
