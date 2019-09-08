@@ -498,6 +498,10 @@ class DocViewer(tk.Frame, object):
                 # Display the error message on the canvas
                 self.display_text(item)
 
+                # Set the rendered page count to zero since no content
+                # has actually been rendered
+                self._rendered_page_count = 0
+
             else:
                 # Presume item contains image data
                 self._add_page_to_canvas(item)
