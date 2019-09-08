@@ -40,7 +40,7 @@ from .backends import (BACKEND_DOC_EXTENSIONS,
                        BACKEND_IMAGE_EXTENSIONS,
                        BACKENDS_BY_EXTENSION,
                        GhostscriptBackend, gs_dpi)
-from .rendering import PageCount, RenderingThread
+from .rendering import DocumentStarted, PageCount, PageStarted, RenderingThread
 
 
 __all__ = ["DocViewer"]
@@ -73,6 +73,26 @@ class DocViewer(tk.Frame, object):
 
       wrap_text (bool; default: True)
         Enables wrapping long lines when displaying plain text.
+
+    This widget supports several custom Tk events:
+
+      <<DocumentStarted>>
+        Rendering started on a document.
+
+      <<PageCount>>
+        The document's page count has been updated.
+
+      <<PageStarted>>
+        Rendering started on a page within a document.
+
+      <<PageFinished>>
+        Rendering finished on a page within a document.
+
+      <<DocumentFinished>>
+        Rendering finished on a document.
+
+      <<RenderingError>>
+        An error occurred while rendering a document.
     """
 
     # Note we explicitly inherit from object because Tkinter on Python 2
@@ -486,10 +506,20 @@ class DocViewer(tk.Frame, object):
             if item is None:
                 # A None value indicates we can exit the processing loop
                 self._rendering.set(0)
+                self.event_generate("<<DocumentFinished>>")
+
+            elif isinstance(item, DocumentStarted):
+                # Indicate rendering has started on the document
+                self.event_generate("<<DocumentStarted>>")
+
+            elif isinstance(item, PageStarted):
+                # Indicate rendering has started on a page
+                self.event_generate("<<PageStarted>>")
 
             elif isinstance(item, PageCount):
                 # Update the number of pages in the document
                 self._page_count = int(item)
+                self.event_generate("<<PageCount>>")
 
             elif isinstance(item, Exception):
                 # An exception occurred in the rendering thread
@@ -502,9 +532,12 @@ class DocViewer(tk.Frame, object):
                 # has actually been rendered
                 self._rendered_page_count = 0
 
+                self.event_generate("<<RenderingError>>")
+
             else:
                 # Presume item contains image data
                 self._add_page_to_canvas(item)
+                self.event_generate("<<PageFinished>>")
 
         except (queue.Empty):
             # Still waiting on the next item

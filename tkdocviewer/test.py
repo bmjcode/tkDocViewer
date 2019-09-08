@@ -40,8 +40,26 @@ class DocViewerTest(unittest.TestCase):
         """Set up the test case."""
 
         self.root = tk.Tk()
+
+        status_frame = tk.Frame(self.root)
+        status_frame.pack(side="top", fill="x", padx=2, pady=2)
+
+        self.status = tk.Label(status_frame,
+                               anchor="e",
+                               justify="right")
+        self.status.pack(side="right")
+
+        self.path_display = tk.Label(status_frame,
+                                     anchor="w",
+                                     justify="l")
+        self.path_display.pack(side="left")
+
         self.viewer = DocViewer(self.root)
         self.viewer.pack(side="top", expand=1, fill="both")
+
+        # Update the page count after each page is finished
+        self.viewer.bind("<<DocumentStarted>>", self._handle_document_started)
+        self.viewer.bind("<<PageFinished>>", self._handle_page_finished)
 
         # Most of the test files are letter-size pages
         self.viewer.fit_page(8.5, 11 * 3 / 5)
@@ -65,6 +83,7 @@ class DocViewerTest(unittest.TestCase):
         """Run a standardized rendering test."""
 
         self.root.wm_title("{0} Rendering Test".format(format_name))
+        self.path_display.configure(text=sample_file)
 
         path = get_sample_file(sample_file)
         self.viewer.display_file(path)
@@ -175,3 +194,23 @@ class DocViewerTest(unittest.TestCase):
         """Test XPS rendering."""
 
         self.run_rendering_test("XPS", "colorcirc.xps", 1)
+
+    #
+    # Internal functions
+    #
+
+    def _handle_document_started(self, event):
+        """Callback when a document has started rendering."""
+
+        status_text = "Rendering started"
+        self.status.configure(text=status_text)
+
+    def _handle_page_finished(self, event):
+        """Callback when a page has finished rendering."""
+
+        status_text = "Rendered {0} of {1} page{2}".format(
+            self.viewer.rendered_page_count,
+            self.viewer.page_count,
+            "" if self.viewer.page_count == 1 else "s"
+        )
+        self.status.configure(text=status_text)

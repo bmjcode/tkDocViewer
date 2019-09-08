@@ -20,6 +20,12 @@ try: string_type = basestring
 except (NameError): string_type = str
 
 
+class DocumentStarted(object):
+    """Trivial class used to indicate rendering has started on a document."""
+
+    pass
+
+
 class PageCount(object):
     """Trivial class used to pass a page count back to the UI."""
 
@@ -30,6 +36,12 @@ class PageCount(object):
 
     def __int__(self):
         return self._count
+
+
+class PageStarted(object):
+    """Trivial class used to indicate rendering has started on a page."""
+
+    pass
 
 
 class RenderingThread(threading.Thread):
@@ -86,6 +98,9 @@ class RenderingThread(threading.Thread):
             # Create a backend instance to render pages
             self.backend = AutoBackend(self.path, **self.kw)
 
+            # Indicate rendering has started on the document
+            self.queue.put(DocumentStarted())
+
             # Determine the page count
             page_count = self.backend.page_count()
             self.queue.put(PageCount(page_count))
@@ -94,6 +109,9 @@ class RenderingThread(threading.Thread):
                 if self.canceler.is_set():
                     # Halt further processing
                     break
+
+                # Indicate we have started rendering the page
+                self.queue.put(PageStarted())
 
                 # Render the page
                 image_data = self.backend.render_page(page)
