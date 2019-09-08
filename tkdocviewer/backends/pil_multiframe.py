@@ -43,17 +43,23 @@ class PILMultiframeBackend(Backend):
     def page_count(self):
         """Return the number of pages in the input file."""
 
-        pc = 1
-        self.im.seek(0)
+        if hasattr(self.im, "num_frames"):
+            # This attribute is available for some formats, like TIFF
+            return self.im.num_frames
 
-        try:
-            while True:
-                self.im.seek(self.im.tell() + 1)
-                pc += 1
+        else:
+            # Count the number of pages manually
+            pc = 1
+            self.im.seek(0)
 
-        except (EOFError):
-            # We've seen every frame in the image
-            return pc
+            try:
+                while True:
+                    self.im.seek(self.im.tell() + 1)
+                    pc += 1
+
+            except (EOFError):
+                # We've seen every frame in the image
+                return pc
 
     def render_page(self, page_num):
         """Render the specified page of the input file."""
