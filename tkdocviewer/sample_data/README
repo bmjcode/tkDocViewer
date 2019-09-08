@@ -1,0 +1,32 @@
+This directory contains several sample files used for unit testing.
+All files used are under permissive licenses or in the public domain.
+
+Current contents:
+
+  29888.txt
+    Full text of Lewis Carroll's "The Hunting of the Snark".
+    Public domain, via Project Gutenberg.
+
+  Rotating_earth_(large).gif
+    Rotating image of the Earth. GFDL 1.2, via Wikipedia.
+
+  backends.ghostscript.pdf
+  backends.ghostscript.ps
+  backends.ghostscript.tiff
+    Source code of tkDocViewer's Ghostscript backend, in various formats.
+    Generated using vim's ":ha > sample_data/backends.ghostscript.ps".
+
+  colorcirc.xps
+    Test image included with the GhostXPS distribution.
+
+  cover.bmp
+  cover.jpg
+  cover.pbm
+  cover.pgm
+  cover.png
+  cover.pnm
+  cover.ppm
+  cover.tga
+  cover.xbm
+    Scan of the cover page from "The Hunting of the Snark", in various
+    formats (JPEG is the original). Public domain, via Project Gutenberg.

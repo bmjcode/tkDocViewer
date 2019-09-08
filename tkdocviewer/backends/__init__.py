@@ -43,6 +43,7 @@ from .pil_multiframe import PILMultiframeBackend
 #  3. Add entries to BACKENDS_BY_EXTENSION for each supported file extension.
 #     Use the extension as the key, and your class as the value.
 #  4. Add each supported extension to the appropriate BACKEND_*_EXTENSIONS.
+#  5. Add a test case for each supported format in ../test.py.
 
 __all__ = [
     "BACKENDS_BY_EXTENSION",

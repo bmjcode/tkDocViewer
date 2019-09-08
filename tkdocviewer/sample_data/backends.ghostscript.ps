@@ -1,0 +1,1552 @@
+%!PS-Adobe-3.0
+%%Title: backends/ghostscript.py
+%%For: bmj
+%%Creator: VIM - Vi IMproved 8.1 (2018 May 18)
+%%CreationDate: Sun Sep  8 11:32:01 2019
+%%DocumentData: Clean8Bit
+%%Orientation: Portrait
+%%Pages: (atend)
+%%PageOrder: Ascend
+%%BoundingBox: 61 42 577 752
+%%DocumentMedia: letter 612 792 0 () ()
+%%DocumentNeededResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%DocumentSuppliedResources: procset VIM-Prolog 1.4 1
+%%+ encoding VIM-latin1 1.0 0
+%%Requirements: duplex collate color
+%%EndComments
+%%BeginDefaults
+%%PageResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%PageMedia: letter
+%%EndDefaults
+%%BeginProlog
+%%BeginResource: procset VIM-Prolog
+%%BeginDocument: /usr/local/share/vim/vim81/print/prolog.ps
+%!PS-Adobe-3.0 Resource-ProcSet
+%%Title: VIM-Prolog
+%%Version: 1.4 1
+%%EndComments
+% Editing of this file is NOT RECOMMENDED.  You run a very good risk of causing
+% all PostScript printing from VIM failing if you do.  PostScript is not called
+% a write-only language for nothing!
+/packedarray where not{userdict begin/setpacking/pop load def/currentpacking
+false def end}{pop}ifelse/CP currentpacking def true setpacking
+/bd{bind def}bind def/ld{load def}bd/ed{exch def}bd/d/def ld
+/db{dict begin}bd/cde{currentdict end}bd
+/T true d/F false d
+/SO null d/sv{/SO save d}bd/re{SO restore}bd
+/L2 systemdict/languagelevel 2 copy known{get exec}{pop pop 1}ifelse 2 ge d
+/m/moveto ld/s/show ld /ms{m s}bd /g/setgray ld/r/setrgbcolor ld/sp{showpage}bd
+/gs/gsave ld/gr/grestore ld/cp/currentpoint ld
+/ul{gs UW setlinewidth cp UO add 2 copy newpath m 3 1 roll add exch lineto
+stroke gr}bd
+/bg{gs r cp BO add 4 -2 roll rectfill gr}bd
+/sl{90 rotate 0 exch translate}bd
+L2{
+/sspd{mark exch{setpagedevice}stopped cleartomark}bd
+/nc{1 db/NumCopies ed cde sspd}bd
+/sps{3 db/Orientation ed[3 1 roll]/PageSize ed/ImagingBBox null d cde sspd}bd
+/dt{2 db/Tumble ed/Duplex ed cde sspd}bd
+/c{1 db/Collate ed cde sspd}bd
+}{
+/nc{/#copies ed}bd
+/sps{statusdict/setpage get exec}bd
+/dt{statusdict/settumble 2 copy known{get exec}{pop pop pop}ifelse
+statusdict/setduplexmode 2 copy known{get exec}{pop pop pop}ifelse}bd
+/c{pop}bd
+}ifelse
+/ffs{findfont exch scalefont d}bd/sf{setfont}bd
+/ref{1 db findfont dup maxlength dict/NFD ed{exch dup/FID ne{exch NFD 3 1 roll
+put}{pop pop}ifelse}forall/Encoding findresource dup length 256 eq{NFD/Encoding
+3 -1 roll put}{pop}ifelse NFD dup/FontType get 3 ne{/CharStrings}{/CharProcs}
+ifelse 2 copy known{2 copy get dup maxlength dict copy[/questiondown/space]{2
+copy known{2 copy get 2 index/.notdef 3 -1 roll put pop exit}if pop}forall put
+}{pop pop}ifelse dup NFD/FontName 3 -1 roll put NFD definefont pop end}bd
+CP setpacking
+(\004)cvn{}bd
+% vim:ff=unix:
+%%EOF
+%%EndDocument
+%%EndResource
+%%BeginResource: encoding VIM-latin1
+%%BeginDocument: /usr/local/share/vim/vim81/print/latin1.ps
+%!PS-Adobe-3.0 Resource-Encoding
+%%Title: VIM-latin1
+%%Version: 1.0 0
+%%EndComments
+/VIM-latin1[
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quotesingle
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash
+/zero /one /two /three /four /five /six /seven
+/eight /nine /colon /semicolon /less /equal /greater /question
+/at /A /B /C /D /E /F /G
+/H /I /J /K /L /M /N /O
+/P /Q /R /S /T /U /V /W
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore
+/grave /a /b /c /d /e /f /g
+/h /i /j /k /l /m /n /o
+/p /q /r /s /t /u /v /w
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /periodcentered
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis]
+/Encoding defineresource pop
+% vim:ff=unix:
+%%EOF
+%%EndDocument
+%%EndResource
+%%EndProlog
+%%BeginSetup
+612 792 0 sps
+1 nc
+T F dt
+T c
+%%IncludeResource: font Courier
+/_F0 /VIM-latin1 /Courier ref
+/F0 10 /_F0 ffs
+%%IncludeResource: font Courier-Bold
+/_F1 /VIM-latin1 /Courier-Bold ref
+/F1 10 /_F1 ffs
+%%IncludeResource: font Courier-Oblique
+/_F2 /VIM-latin1 /Courier-Oblique ref
+/F2 10 /_F2 ffs
+%%IncludeResource: font Courier-BoldOblique
+/_F3 /VIM-latin1 /Courier-BoldOblique ref
+/F3 10 /_F3 ffs
+/UO -1 d
+/UW 0.5 d
+/BO -2.5 d
+%%EndSetup
+%%Page: 1 1
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(backends/ghostscript.py                                                         Page 1)61.2 744.9 ms
+F0 sf
+0.498 0.125 0.498 r
+("""Backend for rendering PDF documents using Ghostscript.)61.2 724.9 ms
+(This is an internal API and subject to change at any time.)61.2 704.9 ms
+(""")61.2 694.9 ms
+0 0 0.376 r
+(import)61.2 674.9 ms
+0 g
+( os)s
+0 0 0.376 r
+(import)61.2 664.9 ms
+0 g
+( sys)s
+0 0 0.376 r
+(import)61.2 654.9 ms
+0 g
+( subprocess)s
+0 0 0.376 r
+(import)61.2 644.9 ms
+0 g
+( io)s
+0.498 0.498 0 r
+(# Used for conversion of Postscript to PDF)61.2 624.9 ms
+0 0 0.376 r
+(import)61.2 614.9 ms
+0 g
+( tempfile)s
+0.498 0.498 0 r
+(# Downscaling support requires PIL)61.2 594.9 ms
+0 0.498 0.498 r
+(try)61.2 584.9 ms
+0 g
+(:)s
+(    )61.2 574.9 ms
+0 0 0.376 r
+(import)s
+0 g
+( PIL)s
+0 0.498 0.498 r
+(except)61.2 564.9 ms
+0 g
+( \()s
+0.188 0.188 0.498 r
+(ImportError)s
+0 g
+(\):)s
+(    PIL = )61.2 554.9 ms
+F1 sf
+0.498 0.498 0 r
+(None)s
+F0 sf
+0 0 0.376 r
+(from)61.2 534.9 ms
+0 g
+( .shared )s
+0 0 0.376 r
+(import)s
+0 g
+( Backend, BackendError, bytes_to_str, check_output)s
+0 0 0.376 r
+(from)61.2 524.9 ms
+0 g
+( .util )s
+0 0 0.376 r
+(import)s
+0 g
+( find_executable)s
+0.498 0.498 0 r
+(# ------------------------------------------------------------------------)61.2 504.9 ms
+(# Path to the Ghostscript executable)61.2 484.9 ms
+0 0.498 0.498 r
+(if)61.2 474.9 ms
+0 g
+( sys.platform.startswith\()s
+0.498 0.125 0.498 r
+("win")s
+0 g
+(\):)s
+(    )61.2 464.9 ms
+0 0 0.376 r
+(from)s
+0 g
+( glob )s
+0 0 0.376 r
+(import)s
+0 g
+( glob)s
+(    )61.2 444.9 ms
+0.498 0.498 0 r
+(# Possible names for the Ghostscript executable and Program Files)s
+0 g
+(    )61.2 434.9 ms
+0.498 0.498 0 r
+(# Only the console version of Ghostscript \(gswin??c.exe\) will work)s
+0 g
+(    )61.2 424.9 ms
+0.498 0.498 0 r
+(# because we need to check its output on stdout.)s
+0 g
+(    )61.2 414.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( sys.maxsize > )s
+0.498 0.125 0.498 r
+(2)s
+0 g
+(**)s
+0.498 0.125 0.498 r
+(32)s
+0 g
+( )s
+0 0.498 0.498 r
+(or)s
+0 g
+( os.getenv\()s
+0.498 0.125 0.498 r
+("ProgramW6432")s
+0 g
+(\):)s
+(        )61.2 404.9 ms
+0.498 0.498 0 r
+(# Favor 64-bit Ghostscript where supported)s
+0 g
+(        gs_names = )61.2 394.9 ms
+0.498 0.125 0.498 r
+("gswin64c.exe")s
+0 g
+(, )s
+0.498 0.125 0.498 r
+("gswin32c.exe")s
+0 g
+(        pf_vars = )61.2 384.9 ms
+0.498 0.125 0.498 r
+("ProgramFiles")s
+0 g
+(, )s
+0.498 0.125 0.498 r
+("ProgramW6432")s
+0 g
+(, )s
+0.498 0.125 0.498 r
+("ProgramFiles\(x86\)")s
+0 g
+(    )61.2 374.9 ms
+0 0.498 0.498 r
+(else)s
+0 g
+(:)s
+(        gs_names = )61.2 364.9 ms
+0.498 0.125 0.498 r
+("gswin32c.exe")s
+0 g
+(,)s
+(        pf_vars = )61.2 354.9 ms
+0.498 0.125 0.498 r
+("ProgramFiles")s
+0 g
+(,)s
+(    )61.2 334.9 ms
+0.498 0.498 0 r
+(# Possible locations to look for Ghostscript...)s
+0 g
+(    )61.2 324.9 ms
+0.498 0.498 0 r
+(# \(This is a list, not a set, to ensure we preserve our search order\))s
+0 g
+(    gs_dirs = [])61.2 314.9 ms
+(    )61.2 294.9 ms
+0.498 0.498 0 r
+(# 1. Your application directory)s
+0 g
+(    )61.2 284.9 ms
+0.498 0.498 0 r
+(#    This lets your application distribute its own Ghostscript binary,)s
+0 g
+(    )61.2 274.9 ms
+0.498 0.498 0 r
+(#    which may be preferable to ensure you have a known good version.)s
+0 g
+(    app_dir = os.path.dirname\(os.path.realpath\(sys.argv[)61.2 264.9 ms
+0.498 0.125 0.498 r
+(0)s
+0 g
+(]\)\))s
+(    )61.2 254.9 ms
+0 0.498 0.498 r
+(for)s
+0 g
+( dirpath, dirnames, filenames )s
+0 0.498 0.498 r
+(in)s
+0 g
+( os.walk\(app_dir\):)s
+(        )61.2 244.9 ms
+0 0.498 0.498 r
+(for)s
+0 g
+( dirname )s
+0 0.498 0.498 r
+(in)s
+0 g
+( dirnames:)s
+(            gs_dir = os.path.join\(dirpath, dirname\))61.2 234.9 ms
+(            )61.2 224.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( glob\(os.path.join\(gs_dir, )s
+0.498 0.125 0.498 r
+("gswin??c.exe")s
+0 g
+(\)\):)s
+(                )61.2 214.9 ms
+0.498 0.498 0 r
+(# Directory appears to contain a Ghostscript executable)s
+0 g
+(                gs_dirs.append\(gs_dir\))61.2 204.9 ms
+(    )61.2 184.9 ms
+0.498 0.498 0 r
+(# 2. A dedicated Ghostscript installation)s
+0 g
+(    )61.2 174.9 ms
+0.498 0.498 0 r
+(#    EXEs are usually under something like %PROGRAMFILES%\\gs\\gs9.27\\bin.)s
+0 g
+(    )61.2 164.9 ms
+0 0.498 0.498 r
+(for)s
+0 g
+( program_files )s
+0 0.498 0.498 r
+(in)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(map)s
+F0 sf
+0 g
+(\(os.getenv, pf_vars\):)s
+(        )61.2 154.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( program_files:)s
+(            gs_dir = os.path.join\(program_files, )61.2 144.9 ms
+0.498 0.125 0.498 r
+("gs")s
+0 g
+(\))s
+(            )61.2 134.9 ms
+0 0.498 0.498 r
+(for)s
+0 g
+( dirpath, dirnames, filenames )s
+0 0.498 0.498 r
+(in)s
+0 g
+( os.walk\(gs_dir\):)s
+(                )61.2 124.9 ms
+0 0.498 0.498 r
+(for)s
+0 g
+( dirname )s
+0 0.498 0.498 r
+(in)s
+0 g
+( dirnames:)s
+(                    gs_dir = os.path.join\(dirpath, dirname\))61.2 114.9 ms
+(                    )61.2 104.9 ms
+0.498 0.498 0 r
+(# Because some of the variables in pf_vars may refer)s
+0 g
+(                    )61.2 94.9 ms
+0.498 0.498 0 r
+(# to the same location, we have to check that we didn't)s
+0 g
+(                    )61.2 84.9 ms
+0.498 0.498 0 r
+(# already include this directory in our search path)s
+0 g
+(                    )61.2 74.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( dirname.lower\(\) == )s
+0.498 0.125 0.498 r
+("bin")s
+0 g
+( )s
+0 0.498 0.498 r
+(and)s
+0 g
+( )s
+0 0.498 0.498 r
+(not)s
+0 g
+( gs_dir )s
+0 0.498 0.498 r
+(in)s
+0 g
+( gs_dirs:)s
+(                        gs_dirs.append\(gs_dir\))61.2 64.9 ms
+(    )61.2 44.9 ms
+0.498 0.498 0 r
+(## 3. Other locations in %PATH%)s
+re sp
+%%PageTrailer
+%%Page: 2 2
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(backends/ghostscript.py                                                         Page 2)61.2 744.9 ms
+F0 sf
+(    )61.2 724.9 ms
+0.498 0.498 0 r
+(##    Deliberately omitted because this is potentially dangerous,)s
+0 g
+(    )61.2 714.9 ms
+0.498 0.498 0 r
+(##    and we can't be sure that whatever we find will be any good.)s
+0 g
+(    )61.2 704.9 ms
+0.498 0.498 0 r
+(#gs_dirs += os.getenv\("PATH"\).split\(os.pathsep\))s
+0 g
+(    )61.2 684.9 ms
+0.498 0.498 0 r
+(# Now look for a Ghostscript executable)s
+0 g
+(    gs_exe = find_executable\(gs_names, gs_dirs\))61.2 674.9 ms
+0 0.498 0.498 r
+(else)61.2 654.9 ms
+0 g
+(:)s
+(    )61.2 644.9 ms
+0.498 0.498 0 r
+(# Assume anything else is some kind of Unix system)s
+0 g
+(    )61.2 634.9 ms
+0.498 0.498 0 r
+(# Most Unix systems have Ghostscript available somewhere in $PATH)s
+0 g
+(    gs_names = )61.2 624.9 ms
+0.498 0.125 0.498 r
+("gs")s
+0 g
+(,)s
+(    gs_dirs = os.getenv\()61.2 614.9 ms
+0.498 0.125 0.498 r
+("PATH")s
+0 g
+(\).split\(os.pathsep\))s
+(    gs_exe = find_executable\(gs_names, gs_dirs\))61.2 604.9 ms
+(gs_version = )61.2 584.9 ms
+F1 sf
+0.498 0.498 0 r
+(None)s
+F0 sf
+0 0.498 0.498 r
+(if)61.2 574.9 ms
+0 g
+( gs_exe:)s
+(    )61.2 564.9 ms
+0.498 0.498 0 r
+(# Retrieve the Ghostscript version number)s
+0 g
+(    )61.2 554.9 ms
+0.498 0.498 0 r
+(# This doubles as a test that our Ghostscript executable is usable.)s
+0 g
+(    )61.2 544.9 ms
+0.498 0.498 0 r
+(# The [:-1] is to remove the trailing newline from Ghostscript's output.)s
+0 g
+(    )61.2 534.9 ms
+0 0.498 0.498 r
+(try)s
+0 g
+(:)s
+(        gs_version = bytes_to_str\(check_output\([gs_exe, )61.2 524.9 ms
+0.498 0.125 0.498 r
+("--version")s
+0 g
+(]\)[:-)s
+0.498 0.125 0.498 r
+(1)s
+0 g
+(]\))s
+(    )61.2 504.9 ms
+0 0.498 0.498 r
+(except)s
+0 g
+( \()s
+0.188 0.188 0.498 r
+(OSError)s
+0 g
+(\):)s
+(        )61.2 494.9 ms
+0.498 0.498 0 r
+(# There's something wrong with our Ghostscript executable!)s
+0 g
+(        gs_exe = )61.2 484.9 ms
+F1 sf
+0.498 0.498 0 r
+(None)s
+F0 sf
+(# ------------------------------------------------------------------------)61.2 464.9 ms
+(# Resolution for Ghostscript rendering \(in dots per inch\))61.2 444.9 ms
+(# )61.2 434.9 ms
+0 g
+(TODO)s
+0.498 0.498 0 r
+(: This should not be hard-coded, but queried at runtime.)s
+0 g
+(gs_dpi = )61.2 424.9 ms
+0.498 0.125 0.498 r
+(96)s
+0.498 0.498 0 r
+(# Resolution used internally when downscaling is enabled)61.2 404.9 ms
+0 g
+(hr_dpi = )61.2 394.9 ms
+0.498 0.125 0.498 r
+(2)s
+0 g
+( * gs_dpi)s
+(__all__ = [)61.2 364.9 ms
+0.498 0.125 0.498 r
+("GhostscriptBackend")s
+0 g
+(, )s
+0.498 0.125 0.498 r
+("GhostscriptNotAvailable")s
+0 g
+(, )s
+0.498 0.125 0.498 r
+("gs_dpi")s
+0 g
+(])s
+0 0.498 0.498 r
+(class)61.2 334.9 ms
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(GhostscriptBackend)s
+F0 sf
+0 g
+(\(Backend\):)s
+(    )61.2 324.9 ms
+0.498 0.125 0.498 r
+("""Backend to render a document using Ghostscript.)s
+(    This backend supports the following formats:)61.2 304.9 ms
+(    PDF -- rendered directly.)61.2 294.9 ms
+(    Postscript -- must be converted to PDF first because rendering)61.2 284.9 ms
+(      individual pages from Postscript files is not supported. This)61.2 274.9 ms
+(      happens automatically when input_file has a .ps extension.)61.2 264.9 ms
+(    Internal format conversion creates temporary files, which are)61.2 244.9 ms
+(    cleaned up when the backend object is destroyed.)61.2 234.9 ms
+(    Supported keyword arguments:)61.2 214.9 ms
+(    enable_downscaling -- whether to enable downscaling using PIL.)61.2 204.9 ms
+(    This backend requires an external Ghostscript binary. Most Unix)61.2 184.9 ms
+(    systems should already have this installed as 'gs'. Windows users)61.2 174.9 ms
+(    can download a suitable installer from the Ghostscript website.)61.2 164.9 ms
+(    To enable downscaling, this backend also requires the PIL module.)61.2 144.9 ms
+(    If downscaling is enabled and the PIL module is not available, the)61.2 134.9 ms
+(    enable_downscaling argument will be silently ignored.)61.2 124.9 ms
+(    """)61.2 114.9 ms
+0 g
+(    __slots__ = [)61.2 94.9 ms
+0.498 0.125 0.498 r
+("enable_downscaling")s
+0 g
+(])s
+(    )61.2 74.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(__init__)s
+F0 sf
+0 g
+(\(self, input_path, **kw\):)s
+(        )61.2 64.9 ms
+0.498 0.125 0.498 r
+("""Return a new Ghostscript rendering backend.""")s
+0 g
+(        Backend.__init__\(self, input_path, **kw\))61.2 44.9 ms
+re sp
+%%PageTrailer
+%%Page: 3 3
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(backends/ghostscript.py                                                         Page 3)61.2 744.9 ms
+F0 sf
+(        )61.2 714.9 ms
+0.498 0.498 0 r
+(# Make sure we have a Ghostscript binary available)s
+0 g
+(        )61.2 704.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( )s
+0 0.498 0.498 r
+(not)s
+0 g
+( gs_exe:)s
+(            )61.2 694.9 ms
+0.498 0.498 0 r
+(# Identify possible executable names and search dirs)s
+0 g
+(            search_names = )61.2 684.9 ms
+0.498 0.125 0.498 r
+(", ")s
+0 g
+(.join\(gs_names\))s
+(            search_dirs = )61.2 674.9 ms
+0.498 0.125 0.498 r
+(")s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(.join\(gs_dirs\))s
+(            )61.2 664.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( )s
+0 0.498 0.498 r
+(not)s
+0 g
+( search_dirs:)s
+(                search_dirs = )61.2 654.9 ms
+0.498 0.125 0.498 r
+("<no Ghostscript installations found>")s
+0 g
+(            )61.2 634.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+(                )61.2 624.9 ms
+0.498 0.125 0.498 r
+("Could not render {0}.)s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(                )61.2 614.9 ms
+0.498 0.125 0.498 r
+("Please make sure you have Ghostscript installed.)s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(                )61.2 604.9 ms
+0.498 0.125 0.498 r
+(")s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(                )61.2 594.9 ms
+0.498 0.125 0.498 r
+("Searched for {1} in these locations:)s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(                )61.2 584.9 ms
+0.498 0.125 0.498 r
+("{2}")s
+0 g
+(                .format\(self.input_path, search_names, search_dirs\))61.2 574.9 ms
+(            \))61.2 564.9 ms
+(        )61.2 544.9 ms
+0.498 0.498 0 r
+(# Whether to enable downscaling)s
+0 g
+(        )61.2 534.9 ms
+0.498 0.498 0 r
+(# This has no effect if PIL is not available on your system.)s
+0 g
+(        )61.2 524.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( )s
+0.498 0.125 0.498 r
+("enable_downscaling")s
+0 g
+( )s
+0 0.498 0.498 r
+(in)s
+0 g
+( kw:)s
+(            self.enable_downscaling = kw[)61.2 514.9 ms
+0.498 0.125 0.498 r
+("enable_downscaling")s
+0 g
+(])s
+(        )61.2 504.9 ms
+0 0.498 0.498 r
+(else)s
+0 g
+(:)s
+(            self.enable_downscaling = )61.2 494.9 ms
+F1 sf
+0.498 0.498 0 r
+(False)s
+F0 sf
+0 g
+(        )61.2 474.9 ms
+0.498 0.498 0 r
+(# Determine whether we can render this file based on its extension)s
+0 g
+(        base, ext = os.path.splitext\(input_path\))61.2 464.9 ms
+(        )61.2 444.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( ext.lower\(\) == )s
+0.498 0.125 0.498 r
+(".pdf")s
+0 g
+(:)s
+(            )61.2 434.9 ms
+0.498 0.498 0 r
+(# Render PDF files directly)s
+0 g
+(            self.input_path = input_path)61.2 424.9 ms
+(        )61.2 404.9 ms
+0 0.498 0.498 r
+(elif)s
+0 g
+( ext.lower\(\) == )s
+0.498 0.125 0.498 r
+(".ps")s
+0 g
+(:)s
+(            )61.2 394.9 ms
+0.498 0.498 0 r
+(# Convert Postscript files to PDF)s
+0 g
+(            fd, pdf_path = tempfile.mkstemp\(suffix=)61.2 384.9 ms
+0.498 0.125 0.498 r
+(".pdf")s
+0 g
+(\))s
+(            os.close\(fd\))61.2 374.9 ms
+(            self.render_to_pdf\(pdf_path\))61.2 364.9 ms
+(            )61.2 344.9 ms
+0.498 0.498 0 r
+(# Render the converted PDF file)s
+0 g
+(            self.input_path = pdf_path)61.2 334.9 ms
+(            self.temp_files.append\(pdf_path\))61.2 324.9 ms
+(        )61.2 304.9 ms
+0 0.498 0.498 r
+(else)s
+0 g
+(:)s
+(            )61.2 294.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+(                )61.2 284.9 ms
+0.498 0.125 0.498 r
+("Could not render {0} because the file type is not ")s
+0 g
+(                )61.2 274.9 ms
+0.498 0.125 0.498 r
+("supported by the Ghostscript backend.")s
+0 g
+(                .format\(input_path\))61.2 264.9 ms
+(            \))61.2 254.9 ms
+(    )61.2 234.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(page_count)s
+F0 sf
+0 g
+(\(self\):)s
+(        )61.2 224.9 ms
+0.498 0.125 0.498 r
+("""Return the number of pages in the input file.""")s
+0 g
+(        base, ext = os.path.splitext\(self.input_path\))61.2 204.9 ms
+(        )61.2 194.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( ext.lower\(\) != )s
+0.498 0.125 0.498 r
+(".pdf")s
+0 g
+(:)s
+(            )61.2 184.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+0.498 0.125 0.498 r
+("Only PDF files are supported.")s
+0 g
+(\))s
+(        )61.2 164.9 ms
+0.498 0.498 0 r
+(# The Ghostscript interpreter expects forward slashes in file paths)s
+0 g
+(        gs_input_path = self.input_path.replace\(os.sep, )61.2 154.9 ms
+0.498 0.125 0.498 r
+("/")s
+0 g
+(\))s
+(        )61.2 134.9 ms
+0.498 0.498 0 r
+(# Ghostscript command to return the page count of a PDF file)s
+0 g
+(        gs_pc_command = )61.2 124.9 ms
+0.498 0.125 0.498 r
+("\({0}\) \(r\) file runpdfbegin pdfpagecount = quit")s
+0 g
+(        )61.2 104.9 ms
+0.498 0.498 0 r
+(# Ghostscript command line)s
+0 g
+(        gs_args = [gs_exe,)61.2 94.9 ms
+(                   )61.2 84.9 ms
+0.498 0.125 0.498 r
+("-q")s
+0 g
+(,)s
+(                   )61.2 74.9 ms
+0.498 0.125 0.498 r
+("-dNODISPLAY")s
+0 g
+(,)s
+(                   )61.2 64.9 ms
+0.498 0.125 0.498 r
+("-c")s
+0 g
+(,)s
+(                   gs_pc_command.format\(gs_input_path\)])61.2 54.9 ms
+re sp
+%%PageTrailer
+%%Page: 4 4
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(backends/ghostscript.py                                                         Page 4)61.2 744.9 ms
+F0 sf
+(        )61.2 724.9 ms
+0.498 0.498 0 r
+(# Return the page count if it's a valid PDF, or None otherwise)s
+0 g
+(        )61.2 714.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(int)s
+F0 sf
+0 g
+(\(self._check_output\(gs_args\)\))s
+(    )61.2 694.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(render_page)s
+F0 sf
+0 g
+(\(self, page_num\):)s
+(        )61.2 684.9 ms
+0.498 0.125 0.498 r
+("""Render the specified page of the input file.""")s
+0 g
+(        base, ext = os.path.splitext\(self.input_path\))61.2 664.9 ms
+(        )61.2 654.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( ext.lower\(\) != )s
+0.498 0.125 0.498 r
+(".pdf")s
+0 g
+(:)s
+(            )61.2 644.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+0.498 0.125 0.498 r
+("Only PDF files are supported.")s
+0 g
+(\))s
+(        )61.2 624.9 ms
+0.498 0.498 0 r
+(# Resolution for Ghostscript rendering)s
+0 g
+(        )61.2 614.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( PIL )s
+0 0.498 0.498 r
+(and)s
+0 g
+( self.enable_downscaling:)s
+(            gs_res = hr_dpi)61.2 604.9 ms
+(        )61.2 594.9 ms
+0 0.498 0.498 r
+(else)s
+0 g
+(:)s
+(            gs_res = gs_dpi)61.2 584.9 ms
+(        )61.2 564.9 ms
+0.498 0.498 0 r
+(# Ghostscript command line)s
+0 g
+(        gs_args = [gs_exe,)61.2 554.9 ms
+(                   )61.2 544.9 ms
+0.498 0.125 0.498 r
+("-q")s
+0 g
+(,)s
+(                   )61.2 534.9 ms
+0.498 0.125 0.498 r
+("-r{0}")s
+0 g
+(.format\(gs_res\),)s
+(                   )61.2 524.9 ms
+0.498 0.125 0.498 r
+("-dBATCH")s
+0 g
+(,)s
+(                   )61.2 514.9 ms
+0.498 0.125 0.498 r
+("-dNOPAUSE")s
+0 g
+(,)s
+(                   )61.2 504.9 ms
+0.498 0.125 0.498 r
+("-dSAFER")s
+0 g
+(,)s
+(                   )61.2 494.9 ms
+0.498 0.125 0.498 r
+("-dPDFSettings=/SCREEN")s
+0 g
+(,)s
+(                   )61.2 484.9 ms
+0.498 0.125 0.498 r
+("-dPrinted=false")s
+0 g
+(,)s
+(                   )61.2 474.9 ms
+0.498 0.125 0.498 r
+("-dTextAlphaBits=4")s
+0 g
+(,)s
+(                   )61.2 464.9 ms
+0.498 0.125 0.498 r
+("-dGraphicsAlphaBits=4")s
+0 g
+(,)s
+(                   )61.2 454.9 ms
+0.498 0.125 0.498 r
+("-dCOLORSCREEN")s
+0 g
+(,)s
+(                   )61.2 444.9 ms
+0.498 0.125 0.498 r
+("-dDOINTERPOLATE")s
+0 g
+(,)s
+(                   )61.2 424.9 ms
+0.498 0.498 0 r
+(# Newer versions of Ghostscript support the -sPageList)s
+0 g
+(                   )61.2 414.9 ms
+0.498 0.498 0 r
+(# option, but our user's version might not have it.)s
+0 g
+(                   )61.2 404.9 ms
+0.498 0.498 0 r
+(# This approach is clumsier, but backwards-compatible.)s
+0 g
+(                   )61.2 394.9 ms
+0.498 0.125 0.498 r
+("-dFirstPage={0}")s
+0 g
+(.format\(page_num\),)s
+(                   )61.2 384.9 ms
+0.498 0.125 0.498 r
+("-dLastPage={0}")s
+0 g
+(.format\(page_num\),)s
+(                   )61.2 364.9 ms
+0.498 0.498 0 r
+(# Raw PPM is the only full-color image format that all)s
+0 g
+(                   )61.2 354.9 ms
+0.498 0.498 0 r
+(# versions of Tk are guaranteed to support.)s
+0 g
+(                   )61.2 344.9 ms
+0.498 0.125 0.498 r
+("-sDEVICE=ppmraw")s
+0 g
+(,)s
+(                   )61.2 334.9 ms
+0.498 0.125 0.498 r
+("-sOutputFile=-")s
+0 g
+(,)s
+(                   self.input_path])61.2 324.9 ms
+(        )61.2 304.9 ms
+0.498 0.498 0 r
+(# Call Ghostscript to render the PDF)s
+0 g
+(        image_data = self._check_output\(gs_args\))61.2 294.9 ms
+(        )61.2 274.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( PIL )s
+0 0.498 0.498 r
+(and)s
+0 g
+( self.enable_downscaling:)s
+(            page_bytes = io.BytesIO\(image_data\))61.2 264.9 ms
+(            page_image = PIL.Image.open\(page_bytes\))61.2 254.9 ms
+(            )61.2 234.9 ms
+0.498 0.498 0 r
+(# Scale down the output from Ghostscript)s
+0 g
+(            w, h = page_image.size)61.2 224.9 ms
+(            )61.2 214.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( page_image.resize\(\(w * gs_dpi // hr_dpi,)s
+(                                      h * gs_dpi // hr_dpi\),)61.2 204.9 ms
+(                                     resample=PIL.Image.BICUBIC\))61.2 194.9 ms
+(        )61.2 174.9 ms
+0 0.498 0.498 r
+(else)s
+0 g
+(:)s
+(            )61.2 164.9 ms
+0.498 0.498 0 r
+(# Return the image data from Ghostscript directly)s
+0 g
+(            )61.2 154.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( image_data)s
+(    )61.2 134.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(render_to)s
+F0 sf
+0 g
+(\(self, device, output_path, *args\):)s
+(        )61.2 124.9 ms
+0.498 0.125 0.498 r
+("""Render the input file to the specified Ghostscript output device.)s
+(        Positional arguments are appended to the Ghostscript command line.)61.2 104.9 ms
+(        """)61.2 94.9 ms
+0 g
+(        )61.2 74.9 ms
+0.498 0.498 0 r
+(# Sanity checks)s
+0 g
+(        )61.2 64.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( output_path == self.input_path:)s
+(            )61.2 54.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+0.498 0.125 0.498 r
+("Input and output must be separate files.")s
+0 g
+(\))s
+(        )61.2 44.9 ms
+0 0.498 0.498 r
+(elif)s
+0 g
+( output_path == )s
+0.498 0.125 0.498 r
+("-")s
+0 g
+(:)s
+re sp
+%%PageTrailer
+%%Page: 5 5
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(backends/ghostscript.py                                                         Page 5)61.2 744.9 ms
+F0 sf
+(            )61.2 724.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+0.498 0.125 0.498 r
+("Rendering to stdout is not supported.")s
+0 g
+(\))s
+(        )61.2 714.9 ms
+0 0.498 0.498 r
+(elif)s
+0 g
+( )s
+0 0.498 0.498 r
+(not)s
+0 g
+( output_path:)s
+(            )61.2 704.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+0.498 0.125 0.498 r
+("You must provide an output path.")s
+0 g
+(\))s
+(        )61.2 684.9 ms
+0.498 0.498 0 r
+(# Ghostscript command line)s
+0 g
+(        gs_args = [gs_exe,)61.2 674.9 ms
+(                   )61.2 664.9 ms
+0.498 0.125 0.498 r
+("-q")s
+0 g
+(,)s
+(                   )61.2 654.9 ms
+0.498 0.125 0.498 r
+("-dBATCH")s
+0 g
+(,)s
+(                   )61.2 644.9 ms
+0.498 0.125 0.498 r
+("-dNOPAUSE")s
+0 g
+(,)s
+(                   )61.2 634.9 ms
+0.498 0.125 0.498 r
+("-dSAFER")s
+0 g
+(,)s
+(                   )61.2 624.9 ms
+0.498 0.125 0.498 r
+("-sDEVICE={0}")s
+0 g
+(.format\(device\),)s
+(                   )61.2 614.9 ms
+0.498 0.125 0.498 r
+("-sOutputFile={0}")s
+0 g
+(.format\(output_path\)])s
+(        )61.2 604.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( args:)s
+(            gs_args += )61.2 594.9 ms
+F1 sf
+0.498 0.498 0 r
+(list)s
+F0 sf
+0 g
+(\(args\))s
+(        gs_args.append\(self.input_path\))61.2 584.9 ms
+(        )61.2 564.9 ms
+0.498 0.498 0 r
+(# Call Ghostscript to convert the file)s
+0 g
+(        self._check_output\(gs_args\))61.2 554.9 ms
+(    )61.2 534.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(render_to_pdf)s
+F0 sf
+0 g
+(\(self, output_path\):)s
+(        )61.2 524.9 ms
+0.498 0.125 0.498 r
+("""Render the input file to PDF.""")s
+0 g
+(        )61.2 504.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( self.render_to\()s
+0.498 0.125 0.498 r
+("pdfwrite")s
+0 g
+(, output_path\))s
+(    )61.2 484.9 ms
+0.498 0.498 0 r
+(# ------------------------------------------------------------------------)s
+0 g
+(    )61.2 464.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(_check_output)s
+F0 sf
+0 g
+(\(self, args\):)s
+(        )61.2 454.9 ms
+0.498 0.125 0.498 r
+("""Wrapper for check_output\(\) to handle error conditions.""")s
+0 g
+(        )61.2 434.9 ms
+0 0.498 0.498 r
+(try)s
+0 g
+(:)s
+(            )61.2 424.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( check_output\(args\))s
+(        )61.2 404.9 ms
+0 0.498 0.498 r
+(except)s
+0 g
+( \(subprocess.CalledProcessError\) )s
+0 0.498 0.498 r
+(as)s
+0 g
+( err:)s
+(            )61.2 394.9 ms
+0.498 0.498 0 r
+(# Something went wrong with the call to Ghostscript)s
+0 g
+(            )61.2 384.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( err.output:)s
+(                )61.2 374.9 ms
+0.498 0.498 0 r
+(# Save the output from Ghostscript)s
+0 g
+(                gs_output = bytes_to_str\(err.output\)[:-)61.2 364.9 ms
+0.498 0.125 0.498 r
+(1)s
+0 g
+(])s
+(                )61.2 344.9 ms
+0.498 0.498 0 r
+(# Quote command line arguments containing spaces)s
+0 g
+(                args = [])61.2 334.9 ms
+(                )61.2 324.9 ms
+0 0.498 0.498 r
+(for)s
+0 g
+( arg )s
+0 0.498 0.498 r
+(in)s
+0 g
+( err.cmd:)s
+(                    )61.2 314.9 ms
+0 0.498 0.498 r
+(if)s
+0 g
+( )s
+0.498 0.125 0.498 r
+(" ")s
+0 g
+( )s
+0 0.498 0.498 r
+(in)s
+0 g
+( arg:)s
+(                        args.append\()61.2 304.9 ms
+0.498 0.125 0.498 r
+('"{0}"')s
+0 g
+(.format\(arg\)\))s
+(                    )61.2 294.9 ms
+0 0.498 0.498 r
+(else)s
+0 g
+(:)s
+(                        args.append\(arg\))61.2 284.9 ms
+(                )61.2 264.9 ms
+0.498 0.498 0 r
+(# Raise a more informative exception)s
+0 g
+(                )61.2 254.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+( BackendError\()s
+(                    )61.2 244.9 ms
+0.498 0.125 0.498 r
+("{0})s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(                    )61.2 234.9 ms
+0.498 0.125 0.498 r
+(")s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(                    )61.2 224.9 ms
+0.498 0.125 0.498 r
+("Ghostscript command line \(return code = {1}\):)s
+0 g
+(\\n)s
+0.498 0.125 0.498 r
+(")s
+0 g
+(                    )61.2 214.9 ms
+0.498 0.125 0.498 r
+("{2}")s
+0 g
+(                    .format\(gs_output, err.returncode, )61.2 204.9 ms
+0.498 0.125 0.498 r
+(" ")s
+0 g
+(.join\(args\)\))s
+(                \))61.2 194.9 ms
+(            )61.2 174.9 ms
+0 0.498 0.498 r
+(else)s
+0 g
+(:)s
+(                )61.2 164.9 ms
+0.498 0.498 0 r
+(# Raise the exception as-is)s
+0 g
+(                )61.2 154.9 ms
+0 0.498 0.498 r
+(raise)s
+0 g
+(    )61.2 134.9 ms
+0.498 0.498 0 r
+(# ------------------------------------------------------------------------)s
+0 g
+(    )61.2 114.9 ms
+0 0 0.376 r
+(@)s
+F1 sf
+0.498 0.498 0 r
+(staticmethod)s
+F0 sf
+0 g
+(    )61.2 104.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(executable)s
+F0 sf
+0 g
+(\(\):)s
+(        )61.2 94.9 ms
+0.498 0.125 0.498 r
+("""Return the path to the Ghostscript executable.""")s
+0 g
+(        )61.2 74.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( gs_exe)s
+(    )61.2 54.9 ms
+0 0 0.376 r
+(@)s
+F1 sf
+0.498 0.498 0 r
+(staticmethod)s
+F0 sf
+0 g
+(    )61.2 44.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(search_path)s
+F0 sf
+0 g
+(\(\):)s
+re sp
+%%PageTrailer
+%%Page: 6 6
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(backends/ghostscript.py                                                         Page 6)61.2 744.9 ms
+F0 sf
+(        )61.2 724.9 ms
+0.498 0.125 0.498 r
+("""Return the search path for the Ghostscript executable.""")s
+0 g
+(        )61.2 704.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( gs_dirs)s
+(    )61.2 684.9 ms
+0 0 0.376 r
+(@)s
+F1 sf
+0.498 0.498 0 r
+(staticmethod)s
+F0 sf
+0 g
+(    )61.2 674.9 ms
+0 0.498 0.498 r
+(def)s
+0 g
+( )s
+F1 sf
+0.498 0.498 0 r
+(version)s
+F0 sf
+0 g
+(\(\):)s
+(        )61.2 664.9 ms
+0.498 0.125 0.498 r
+("""Return the version of the Ghostscript executable.""")s
+0 g
+(        )61.2 644.9 ms
+0 0.498 0.498 r
+(return)s
+0 g
+( gs_version)s
+re sp
+%%PageTrailer
+%%Trailer
+%%Pages: 6
+%%EOF
+
