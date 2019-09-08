@@ -9,7 +9,33 @@ import subprocess
 
 
 class Backend(object):
-    """Base class for tkDocViewer backends."""
+    """Base class for tkDocViewer backends.
+
+    The backend constructor accepts the path to an input file as
+    its first and only positional argument.
+
+    Backends may optionally accept additional keyword arguments.
+    Currently recognized keywords are:
+
+      enable_downscaling
+        Whether to enable downscaling in the Ghostscript backend.
+
+    Since the current rendering code always passes all keywords
+    regardless of whether support is implemented in a particular
+    backend, unsupported keywords should be silently ignored.
+
+    A minimal backend implements two functions:
+
+      page_count()
+        Return the number of pages in the input file.
+
+      render_page(page_num)
+        Render the specified page of the input file.
+        Supported return types are:
+        - PIL Image object
+        - Tkinter PhotoImage object
+        - Raw image data understood by PhotoImage
+    """
 
     __slots__ = ["input_path", "temp_files"]
 
