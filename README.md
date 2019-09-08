@@ -36,7 +36,7 @@ For detailed documentation, try `python3 -m pydoc tkdocviewer`.
 
 ## Supported Formats
 
-**Note**: Most file formats require third-party modules or external applications. tkDocViewer will still run without them, but file format support will be limited by what's available on your system.
+**Note**: Most file formats require third-party modules or external applications to be present at runtime. tkDocViewer will still work without them, but file format support will be limited by what's available on your system.
 
 ### Document Formats
 Format | Extensions | Requirements | Notes
