@@ -20,6 +20,18 @@ try: string_type = basestring
 except (NameError): string_type = str
 
 
+class PageCount(object):
+    """Trivial class used to pass a page count back to the UI."""
+
+    __slots__ = ["_count"]
+
+    def __init__(self, count):
+        self._count = count
+
+    def __int__(self):
+        return self._count
+
+
 class RenderingThread(threading.Thread):
     """Thread to run a rendering operation in the background.
 
@@ -74,7 +86,11 @@ class RenderingThread(threading.Thread):
             # Create a backend instance to render pages
             self.backend = AutoBackend(self.path, **self.kw)
 
-            for page in self._parse_page_list():
+            # Determine the page count
+            page_count = self.backend.page_count()
+            self.queue.put(PageCount(page_count))
+
+            for page in self._parse_page_list(page_count):
                 if self.canceler.is_set():
                     # Halt further processing
                     break
@@ -94,18 +110,20 @@ class RenderingThread(threading.Thread):
 
     # ------------------------------------------------------------------------
 
-    def _parse_page_list(self):
-        """Parse the list of pages to render."""
+    def _parse_page_list(self, page_count):
+        """Parse the list of pages to render.
+
+        The page_count argument specifies the number of pages in the
+        document. It was formerly calculated here, but is now calculated
+        in run() so it can also be passed back to the UI thread.
+        """
 
         pages = self.pages
-
-        # Determine the page count
-        pc = self.backend.page_count()
 
         # Default to displaying all pages in the file
         # This is here, not in an else-clause, so we'll still be covered
         # in case something goes weird within one of the if-clauses below.
-        display_pages = range(1, pc + 1)
+        display_pages = range(1, page_count + 1)
 
         if isinstance(pages, string_type):
             # Interpret a string as a list of pages
@@ -116,7 +134,7 @@ class RenderingThread(threading.Thread):
             pages = (pages.strip()
                           .lower()
                           .replace(" ", "")
-                          .replace("end", str(pc)))
+                          .replace("end", str(page_count)))
 
             # Process this as a comma-separated list of individual
             # page numbers and/or ranges
@@ -144,7 +162,7 @@ class RenderingThread(threading.Thread):
             display_pages = pages
 
         # Return the pages to render, filtering out invalid page numbers
-        return filter(lambda page: 1 <= page <= pc, display_pages)
+        return filter(lambda page: 1 <= page <= page_count, display_pages)
 
     def _push_error(self, err):
         """Push an error message onto the queue."""

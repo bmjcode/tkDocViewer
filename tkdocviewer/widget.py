@@ -40,7 +40,7 @@ from .backends import (BACKEND_DOC_EXTENSIONS,
                        BACKEND_IMAGE_EXTENSIONS,
                        BACKENDS_BY_EXTENSION,
                        GhostscriptBackend, gs_dpi)
-from .rendering import RenderingThread
+from .rendering import PageCount, RenderingThread
 
 
 __all__ = ["DocViewer"]
@@ -86,6 +86,12 @@ class DocViewer(tk.Frame, object):
         # The currently displayed file path and pages
         self._display_path = None
         self._display_pages = None
+
+        # The number of pages in the displayed file
+        self._page_count = 1
+
+        # The number of pages that have been rendered so far
+        self._rendered_page_count = 0
 
         # Used to track whether we are currently rendering a page.
         # Watch this with wait_variable() if you need to do anything
@@ -348,6 +354,9 @@ class DocViewer(tk.Frame, object):
                                  text=message, font=self._text_font)
         self.refresh()
 
+        # The displayed text is always considered to be the entire "document"
+        self._rendered_page_count = 1
+
         self.scroll_to_top()
 
     def erase(self):
@@ -370,6 +379,10 @@ class DocViewer(tk.Frame, object):
         # Forget the currently displayed file path and pages
         self._display_path = None
         self._display_pages = None
+
+        # Reset the page counts
+        self._page_count = 1
+        self._rendered_page_count = 0
 
         if gc.isenabled():
             # Call the garbage collector to free unused memory
@@ -454,6 +467,9 @@ class DocViewer(tk.Frame, object):
         # Offset the next page by the height of this page, plus 4px padding
         self._y_offset += page_image.height() + 4
 
+        # Increment the number of pages rendered
+        self._rendered_page_count += 1
+
     def _process_queue(self):
         """Retrieve data from a rendering thread."""
 
@@ -470,6 +486,10 @@ class DocViewer(tk.Frame, object):
             if item is None:
                 # A None value indicates we can exit the processing loop
                 self._rendering.set(0)
+
+            elif isinstance(item, PageCount):
+                # Update the number of pages in the document
+                self._page_count = int(item)
 
             elif isinstance(item, Exception):
                 # An exception occurred in the rendering thread
@@ -645,6 +665,35 @@ class DocViewer(tk.Frame, object):
         """
 
         return self._force_text_display
+
+    @property
+    def page_count(self):
+        """The number of pages in the displayed file.
+
+        This property returns the number of logical pages in the document
+        as defined by its file format. Note this is not necessarily the
+        number of physical pages that would be needed to fit its contents.
+
+        This is only applicable to file formats with an inherent concept
+        of pages (or some equivalent unit, such as image frames).
+
+        For animated images, this is the number of frames in the animation.
+
+        Formats rendered as plain text are always considered to have one
+        logical page, regardless of the actual length of their content.
+        """
+
+        return self._page_count
+
+    @property
+    def rendered_page_count(self):
+        """The number of pages that have been rendered.
+
+        This is based on local pages as defined by the displayed file's
+        format. See the documentation for the page_count property, above.
+        """
+
+        return self._rendered_page_count
 
     @property
     def rendering(self):
