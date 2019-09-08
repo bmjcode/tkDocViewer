@@ -757,6 +757,21 @@ class DocViewer(tk.Frame, object):
 
     # ------------------------------------------------------------------------
 
+    @staticmethod
+    def filetypes():
+        """Return a list of supported file types for use with file dialogs."""
+
+        def stringify(extensions):
+            return " ".join("*{0}".format(ext) for ext in extensions)
+
+        return [
+            ("All Supported Files", stringify(DocViewer.known_extensions)),
+            ("Documents", stringify(DocViewer.doc_extensions)),
+            ("Images", stringify(DocViewer.image_extensions)),
+        ]
+
+    # ------------------------------------------------------------------------
+
     # Keys for configure() to forward to the canvas widget
     _CANVAS_KEYS = "width", "height", "takefocus"
 
@@ -773,11 +788,11 @@ class DocViewer(tk.Frame, object):
 
     # ------------------------------------------------------------------------
 
+    # These are left in for backwards compatibility with version 1.0.
+    # New code should use can_display(), filetypes(), etc. as appropriate.
+    #
     # These values are technically user-customizable, but this is considered
     # an undocumented feature, and may be removed from a future release.
-
-    # Recognized document extensions
-    doc_extensions = BACKEND_DOC_EXTENSIONS
 
     # Recognized image extensions
     # Note: GIF and TIFF support is handled by PILMultiframeBackend.
@@ -791,8 +806,12 @@ class DocViewer(tk.Frame, object):
     _builtin_text_extensions = [".txt"]
     text_extensions = _builtin_text_extensions
 
+    # Recognized document extensions
+    doc_extensions = sorted(text_extensions
+                            + BACKEND_DOC_EXTENSIONS)
+
     # All known file extensions
-    known_extensions = doc_extensions + image_extensions + text_extensions
+    known_extensions = sorted(doc_extensions + image_extensions)
 
     # ------------------------------------------------------------------------
 
