@@ -3,10 +3,10 @@
 from setuptools import setup, find_packages
 
 NAME = "tkDocViewer"
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 AUTHOR = "Benjamin Johnson"
 AUTHOR_EMAIL = "bmjcode@gmail.com"
-DESCRIPTION = "Document viewer widget for Tkinter"
+DESCRIPTION = "Document viewer widget for Tkinter (discontinued!)"
 
 with open("README.md", "r") as readme:
     LONG_DESCRIPTION = readme.read()
@@ -14,7 +14,7 @@ with open("README.md", "r") as readme:
 URL = "https://github.com/bmjcode/tkDocViewer"
 PACKAGES = find_packages()
 CLASSIFIERS = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 7 - Inactive",
     "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",

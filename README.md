@@ -5,6 +5,19 @@ It supports a variety of document and image formats; see below for the complete 
 Both Python 2 and 3 are supported, on Windows and Unix platforms.
 
 
+## Development Status
+
+**tkDocViewer is discontinued. I will no longer be issuing updates or providing technical support.**
+
+I created tkDocViewer to fill a particular need using the tools I had available at the time. It did the job, but was never an elegant solution. Its design suffers from poor accessibility, high resource consumption, and limited support for advanced file-format features. For example, tkDocViewer displays PDF files simply by rendering each page as a bitmap image. This uses huge amounts of memory and processor time, and prevents tkDocViewer from supporting useful features like find-in-page, since it does not actually process textual content in PDF files as text.
+
+Given its design limitations, and given that I no longer need it for my own projects, I have decided to discontinue development of tkDocViewer. The code will remain available on GitHub, since others may still find value in it. However, I will no longer be issuing updates or providing technical support.
+
+If you are starting a new project where PDF support is important, I strongly encourage you to consider a more modern toolkit like GTK, Qt, or wxWidgets. These toolkits offer far more robust viewer widgets with greater accessibility, lower resource consumption, and more extensive file-format support than tkDocViewer can provide.
+
+If you are still using tkDocViewer in an existing project, please note that users have reported PDF rendering problems with Ghostscript 9.5*x* releases. For more information, please see [issue #1](https://github.com/bmjcode/tkDocViewer/issues/1) on GitHub. Downgrading to Ghostscript 9.27 may help as a short-term workaround.
+
+
 ## Usage
 
 tkDocViewer consists of a single module, `tkdocviewer` (note the module name is lowercase), which exports a single class, `DocViewer`.
