@@ -3,6 +3,11 @@
 This is an internal API and subject to change at any time.
 """
 
+# Please note:
+# Using -dSAFER, which was tkDocViewer's original behavior, breaks
+# PDF support on Ghostscript versions >= 9.50. See issue #1 on GitHub.
+# You must explicitly pass -dNOSAFER when handling PDFs to avoid breakage.
+
 import os
 import sys
 import subprocess
@@ -202,6 +207,7 @@ class GhostscriptBackend(Backend):
         gs_args = [gs_exe,
                    "-q",
                    "-dNODISPLAY",
+                   "-dNOSAFER",
                    "-c",
                    gs_pc_command.format(gs_input_path)]
 
@@ -227,7 +233,7 @@ class GhostscriptBackend(Backend):
                    "-r{0}".format(gs_res),
                    "-dBATCH",
                    "-dNOPAUSE",
-                   "-dSAFER",
+                   "-dNOSAFER",
                    "-dPDFSettings=/SCREEN",
                    "-dPrinted=false",
                    "-dTextAlphaBits=4",
@@ -283,7 +289,7 @@ class GhostscriptBackend(Backend):
                    "-q",
                    "-dBATCH",
                    "-dNOPAUSE",
-                   "-dSAFER",
+                   "-dNOSAFER",
                    "-sDEVICE={0}".format(device),
                    "-sOutputFile={0}".format(output_path)]
         if args:
